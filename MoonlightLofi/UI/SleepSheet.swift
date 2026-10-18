@@ -17,6 +17,7 @@ struct SleepSheet: View {
                     .foregroundStyle(Palette.text)
                 Spacer()
                 Button("common.done") { dismiss() }
+                    .accessibilityIdentifier("sleep.done")
                     .foregroundStyle(Palette.mist)
             }
             Text("sleep.hint")
@@ -60,6 +61,7 @@ struct SleepSheet: View {
             Spacer(minLength: 0)
         }
         .padding(24)
+        .accessibilityIdentifier("screen.sleep")
         .onAppear {
             if fade >= minutes {
                 fade = min(5, max(1, minutes - 1))

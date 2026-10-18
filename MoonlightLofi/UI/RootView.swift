@@ -11,13 +11,29 @@ struct RootView: View {
         TimelineView(.periodic(from: .now, by: 1)) { timeline in
             TabView {
                 NowView(now: timeline.date)
-                    .tabItem { Label("tab.listen", systemImage: "moon.stars") }
+                    .accessibilityIdentifier("screen.listen")
+                    .tabItem {
+                        Label("tab.listen", systemImage: "moon.stars")
+                            .accessibilityIdentifier("tab.listen")
+                    }
                 LibraryView()
-                    .tabItem { Label("tab.library", systemImage: "music.note.list") }
+                    .accessibilityIdentifier("screen.library")
+                    .tabItem {
+                        Label("tab.library", systemImage: "music.note.list")
+                            .accessibilityIdentifier("tab.library")
+                    }
                 FocusView(now: timeline.date)
-                    .tabItem { Label("tab.focus", systemImage: "timer") }
+                    .accessibilityIdentifier("screen.focus")
+                    .tabItem {
+                        Label("tab.focus", systemImage: "timer")
+                            .accessibilityIdentifier("tab.focus")
+                    }
                 YouView()
-                    .tabItem { Label("tab.you", systemImage: "person") }
+                    .accessibilityIdentifier("screen.you")
+                    .tabItem {
+                        Label("tab.you", systemImage: "person")
+                            .accessibilityIdentifier("tab.you")
+                    }
             }
             .background(Tick(date: timeline.date))
         }

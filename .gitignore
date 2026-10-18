@@ -1,6 +1,8 @@
 .DS_Store
 build/
 DerivedData/
+screenshots/
+*.xcresult
 *.xcuserstate
 xcuserdata/
 *.xcscmblueprint

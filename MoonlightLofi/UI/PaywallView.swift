@@ -12,6 +12,7 @@ struct PaywallView: View {
                 HStack {
                     Spacer()
                     Button("paywall.close") { dismiss() }
+                        .accessibilityIdentifier("paywall.close")
                         .font(.system(.body, design: .rounded))
                         .foregroundStyle(Palette.mist)
                 }
@@ -81,6 +82,7 @@ struct PaywallView: View {
             }
             .padding(24)
         }
+        .accessibilityIdentifier("screen.paywall")
     }
 
     private func benefit(_ title: String, _ detail: String) -> some View {

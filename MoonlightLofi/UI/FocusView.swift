@@ -23,7 +23,7 @@ struct FocusView: View {
                             .foregroundStyle(Palette.mist)
                     }
 
-                    PrimaryButton(titleKey: primaryKey, systemImage: primarySymbol) {
+                    PrimaryButton(titleKey: primaryKey, systemImage: primarySymbol, identifier: "focus.primary") {
                         if model.focus.snapshot.isRunning {
                             model.focus.pause()
                         } else {

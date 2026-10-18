@@ -63,6 +63,7 @@ struct NowView: View {
                 .padding(.horizontal, 2)
                 .padding(.vertical, 2)
             }
+            .accessibilityIdentifier("scene.picker")
         }
         .accessibilityLabel(Text("a11y.scenes"))
     }
@@ -134,6 +135,7 @@ struct NowView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("scene.\(scene.rawValue)")
         .accessibilityLabel(Text(LocalizedStringKey(scene.titleKey)))
         .accessibilityHint(Text(locked ? "scene.locked" : ""))
         .accessibilityAddTraits(selected ? .isSelected : [])
@@ -217,7 +219,9 @@ struct NowView: View {
             IconCircle(
                 systemImage: model.playback.isPlaying ? "pause.fill" : "play.fill",
                 labelKey: model.playback.isPlaying ? "action.pause" : "action.play",
-                prominent: true
+                prominent: true,
+                identifier: "transport.play",
+                value: model.playback.isPlaying ? "playing" : "paused"
             ) {
                 if model.playback.current == nil, let first = model.catalog.tracks.first {
                     model.play(first)
@@ -250,6 +254,7 @@ struct NowView: View {
                     .background(Color.white.opacity(0.08), in: Capsule())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("action.sleep")
             .foregroundStyle(model.playback.sleepPlan == nil ? Palette.text : Palette.moon)
 
             Button {

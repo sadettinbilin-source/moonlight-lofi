@@ -2,7 +2,8 @@ import SwiftUI
 
 struct PrimaryButton: View {
     var titleKey: String
-    var systemImage: String?
+    var systemImage: String? = nil
+    var identifier: String? = nil
     var action: () -> Void
 
     var body: some View {
@@ -20,6 +21,7 @@ struct PrimaryButton: View {
             .foregroundStyle(Palette.ink)
         }
         .buttonStyle(.plain)
+        .modifier(AccessMark(identifier: identifier, value: nil))
     }
 }
 
@@ -28,6 +30,8 @@ struct IconCircle: View {
     var labelKey: String
     var active: Bool = false
     var prominent: Bool = false
+    var identifier: String? = nil
+    var value: String? = nil
     var action: () -> Void
 
     var body: some View {
@@ -40,6 +44,44 @@ struct IconCircle: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(LocalizedStringKey(labelKey)))
+        .modifier(AccessMark(identifier: identifier, value: value))
+    }
+}
+
+private struct AccessMark: ViewModifier {
+    var identifier: String?
+    var value: String?
+
+    func body(content: Content) -> some View {
+        content
+            .modifier(AccessID(identifier))
+            .modifier(AccessValue(value))
+    }
+}
+
+private struct AccessID: ViewModifier {
+    var identifier: String?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let identifier {
+            content.accessibilityIdentifier(identifier)
+        } else {
+            content
+        }
+    }
+}
+
+private struct AccessValue: ViewModifier {
+    var value: String?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let value {
+            content.accessibilityValue(Text(value))
+        } else {
+            content
+        }
     }
 }
 

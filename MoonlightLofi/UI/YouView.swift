@@ -102,6 +102,7 @@ struct YouView: View {
                 Button("you.upgrade") {
                     model.showPaywall = true
                 }
+                .accessibilityIdentifier("you.upgrade")
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .foregroundStyle(Palette.ink)
                 .padding(.horizontal, 16)
@@ -119,6 +120,7 @@ struct YouView: View {
                     .foregroundStyle(Palette.text)
                 if !model.isPro {
                     Button("you.upgrade") { model.showPaywall = true }
+                        .accessibilityIdentifier("you.upgrade")
                         .font(.system(.body, design: .rounded))
                         .foregroundStyle(Palette.moon)
                 } else {

@@ -30,13 +30,16 @@ schemes:
         MoonlightLofi: all
         MoonlightLofiWidget: all
         MoonlightLofiTests: [test]
+        MoonlightLofiUITests: [test]
     run:
       config: Debug
       storeKitConfiguration: MoonlightLofi/Resources/Products.storekit
     test:
       config: Debug
+      storeKitConfiguration: MoonlightLofi/Resources/Products.storekit
       targets:
         - MoonlightLofiTests
+        - MoonlightLofiUITests
 targets:
   MoonlightLofi:
     type: application
@@ -118,3 +121,15 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/MoonlightLofi.app/MoonlightLofi"
         BUNDLE_LOADER: "$(TEST_HOST)"
+  MoonlightLofiUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: MoonlightLofiUITests
+    dependencies:
+      - target: MoonlightLofi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.moonlightlofi.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: MoonlightLofi
