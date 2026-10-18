@@ -1,0 +1,10 @@
+track-02 7 F 76 I-vi-ii-V
+track-03 12 A 84 IV-iii-ii-I
+track-04 23 Eb 72 vi-IV-I-V
+track-05 31 G 82 I-IV-iv-I
+track-06 44 C 78 ii-V-iii-vi
+track-07 58 Bb 86 ii-V-I-vi
+track-08 63 E 74 I-vi-ii-V
+track-09 77 Ab 80 IV-iii-ii-I
+track-10 89 B 83 vi-IV-I-V
+track-11 96 Db 75 I-IV-iv-I

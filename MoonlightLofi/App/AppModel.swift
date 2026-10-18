@@ -49,7 +49,7 @@ final class AppModel {
         if let raw = defaults.string(forKey: Prefs.loop), let mode = LoopMode(rawValue: raw) {
             playback.loop = mode
         } else {
-            playback.loop = .all
+            playback.loop = .one
         }
         if let data = defaults.data(forKey: Prefs.sleep),
            let plan = SleepPlan.decoded(data),

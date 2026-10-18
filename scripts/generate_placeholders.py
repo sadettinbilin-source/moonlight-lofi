@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Generate short placeholder tones and the app icon.
+"""Retired placeholder-tone writer.
 
-These are not the channel's music. Replace the wav files in
-MoonlightLofi/Resources/Audio with masters you own, and keep the
-filenames in sync with tracks.json (or change the JSON).
+The catalog audio is the original loops in MoonlightLofi/Resources/Audio.
+Regenerating tones here would overwrite nothing useful and must not replace
+those masters. New music comes from tools/lofi-gen.
 """
 
 import math
@@ -95,12 +95,9 @@ def write_icon(path: Path) -> None:
 
 
 def main() -> None:
-    tone(AUDIO / "midnight-kettle.wav", [196.0, 293.66], 0.0, 1)
-    tone(AUDIO / "window-rain.wav", [146.83, 220.0], 0.015, 2)
-    tone(AUDIO / "violet-hour.wav", [220.0, 329.63], 0.0, 3)
-    write_icon(ICON)
-    print(f"Wrote tones to {AUDIO}")
-    print(f"Wrote {ICON}")
+    print("Catalog audio is the original loops in MoonlightLofi/Resources/Audio.")
+    print("Generate new masters with tools/lofi-gen/make_track.sh.")
+    print("This script no longer writes tones or the app icon.")
 
 
 if __name__ == "__main__":

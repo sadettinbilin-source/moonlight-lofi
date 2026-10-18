@@ -143,7 +143,7 @@ struct NowView: View {
         VStack(alignment: .leading, spacing: 12) {
             if let track = model.playback.current {
                 HStack {
-                    Text(LocalizedStringKey(track.mood))
+                    Text(trackMeta(track))
                         .font(.system(.subheadline, design: .rounded))
                         .foregroundStyle(Palette.mist)
                     Spacer()
@@ -277,6 +277,17 @@ struct NowView: View {
         } else {
             Label("action.download", systemImage: "arrow.down.circle")
         }
+    }
+
+    private func trackMeta(_ track: Track) -> String {
+        var parts = [L10n.tr(track.mood)]
+        if let key = track.musicalKey {
+            parts.append(L10n.tr("key.\(key)"))
+        }
+        if let bpm = track.bpm {
+            parts.append(L10n.tr("meta.bpm", bpm))
+        }
+        return parts.joined(separator: " · ")
     }
 
     private var loopKey: String {

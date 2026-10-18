@@ -10,7 +10,22 @@ final class CatalogTests: XCTestCase {
         XCTAssertEqual(catalog.tracks.count, 1)
         XCTAssertFalse(catalog.tracks[0].isPro)
         XCTAssertFalse(catalog.tracks[0].placeholder)
+        XCTAssertFalse(catalog.tracks[0].seamless)
+        XCTAssertEqual(catalog.tracks[0].artist, "Moonlight Lofi")
+        XCTAssertNil(catalog.tracks[0].musicalKey)
+        XCTAssertNil(catalog.tracks[0].bpm)
         XCTAssertTrue(catalog.tracks[0].isReadyToPlay)
+    }
+
+    func testDecodesKeyTempoAndSeamlessLoop() throws {
+        let json = """
+        {"tracks":[{"id":"rainy-window","title":"Rainy Window","artist":"Moonlight Lofi","mood":"mood.rainGlass","key":"D","bpm":80,"duration":150,"bundledFile":"rainy-window.m4a","seamless":true}]}
+        """.data(using: .utf8)!
+        let track = try CatalogDecoder.decode(json).tracks[0]
+        XCTAssertEqual(track.musicalKey, "D")
+        XCTAssertEqual(track.bpm, 80)
+        XCTAssertTrue(track.seamless)
+        XCTAssertEqual(track.artist, "Moonlight Lofi")
     }
 
     func testRejectsMissingSourceDuplicateIdsAndInsecureURLs() {
@@ -45,12 +60,41 @@ final class CatalogTests: XCTestCase {
         let catalogURL = root.appendingPathComponent("MoonlightLofi/Resources/Catalog/tracks.json")
         let data = try Data(contentsOf: catalogURL)
         let catalog = try CatalogDecoder.decode(data)
-        XCTAssertGreaterThanOrEqual(catalog.tracks.filter { !$0.isPro && $0.isReadyToPlay }.count, 2)
-        XCTAssertGreaterThanOrEqual(catalog.tracks.filter(\.isPro).count, 1)
-        for track in catalog.tracks where track.hasBundledAudio {
-            let file = root.appendingPathComponent("MoonlightLofi/Resources/Audio/\(track.bundledFile ?? "")")
-            XCTAssertTrue(FileManager.default.fileExists(atPath: file.path), track.bundledFile ?? "")
+        let expected: [(String, String, String, Int, Bool)] = [
+            ("rainy-window", "Rainy Window", "D", 80, false),
+            ("midnight-tea", "Midnight Tea", "F", 76, false),
+            ("streetlight-drift", "Streetlight Drift", "A", 84, true),
+            ("slow-moon-rising", "Slow Moon Rising", "Eb", 72, true),
+            ("rooftop-breeze", "Rooftop Breeze", "G", 82, true),
+            ("notebook-margins", "Notebook Margins", "C", 78, false),
+            ("last-train-home", "Last Train Home", "Bb", 86, true),
+            ("sleepy-cat-nap", "Sleepy Cat Nap", "E", 74, false),
+            ("fogged-glass", "Fogged Glass", "Ab", 80, true),
+            ("neon-puddles", "Neon Puddles", "B", 83, true),
+            ("lantern-glow", "Lantern Glow", "Db", 75, true)
+        ]
+        XCTAssertEqual(catalog.tracks.map(\.id), expected.map(\.0))
+        let free = Set(catalog.tracks.filter { !$0.isPro }.map(\.id))
+        XCTAssertEqual(free, ["rainy-window", "midnight-tea", "notebook-margins", "sleepy-cat-nap"])
+        for (track, row) in zip(catalog.tracks, expected) {
+            XCTAssertEqual(track.title, row.1)
+            XCTAssertEqual(track.artist, "Moonlight Lofi")
+            XCTAssertEqual(track.musicalKey, row.2)
+            XCTAssertEqual(track.bpm, row.3)
+            XCTAssertEqual(track.isPro, row.4)
+            XCTAssertEqual(track.duration, 150, accuracy: 0.001)
+            XCTAssertTrue(track.seamless)
+            XCTAssertFalse(track.placeholder)
+            XCTAssertTrue(track.isReadyToPlay)
+            XCTAssertEqual(track.bundledFile, "\(track.id).m4a")
+            let file = root.appendingPathComponent("MoonlightLofi/Resources/Audio/\(track.id).m4a")
+            XCTAssertTrue(FileManager.default.fileExists(atPath: file.path), track.id)
         }
+        let audio = root.appendingPathComponent("MoonlightLofi/Resources/Audio")
+        let names = try FileManager.default.contentsOfDirectory(at: audio, includingPropertiesForKeys: nil)
+            .map(\.lastPathComponent)
+            .filter { !$0.hasPrefix(".") }
+        XCTAssertEqual(Set(names), Set(expected.map { "\($0.0).m4a" }))
     }
 
     func testStoreKitConfigUsesTheSameProductIDs() throws {

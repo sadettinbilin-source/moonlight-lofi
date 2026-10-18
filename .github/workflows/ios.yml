@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate catalog and placeholder audio
+      - name: Validate catalog and bundled audio
         run: python3 scripts/validate_catalog.py
 
       - name: Unit tests

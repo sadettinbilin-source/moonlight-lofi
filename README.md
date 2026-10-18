@@ -6,7 +6,7 @@ Swift 5.9, SwiftUI, iOS 17 and later.
 
 ## Features
 
-- Player for a JSON catalog, with shuffle, loop, lock screen controls, and background audio.
+- Player for eleven original seamless loops, with shuffle, loop, lock screen controls, and background audio. Loop one repeats the current track through `AVPlayerLooper`, so the join stays gapless.
 - Offline copies in Application Support (`MoonlightTracks`). Downloads are part of Pro.
 - Focus timer with custom focus, short break, and long break lengths. Remaining time is `endDate - now`, so leaving the app does not drift the clock.
 - A local notification when a phase ends, a Live Activity (Lock Screen and Dynamic Island), and a Home Screen widget.
@@ -35,7 +35,7 @@ MoonlightLofiWidget        Home Screen widget and Live Activity
 | `SleepSceneOffer` | Offers Luna Sleep while a sleep timer is running, until the listener switches or dismisses it. |
 | `EntitlementPolicy` | What Free and Pro may play, download, and open. StoreKit only answers "which product ids are active?" |
 | `CatalogDecoder` | `tracks.json`: safe ids, https URLs, bundled file or remote URL. |
-| `PlaybackController` | `AVPlayer`, Now Playing, remote commands, and the sleep fade while audio is playing. |
+| `PlaybackController` | `AVQueuePlayer` and `AVPlayerLooper` for gapless repeat, Now Playing, remote commands, and the sleep fade while audio is playing. |
 | `DownloadManager` | Copies a bundled file, or downloads an https URL, into Application Support. |
 | `StoreManager` | Loads products, purchases, restores with `AppStore.sync()`, and listens to `Transaction.updates`. |
 | `FocusSessionRecord` | SwiftData row for a finished focus interval. The streak treats today, or yesterday if today is still empty, as the live end of the run. |
@@ -68,50 +68,39 @@ Background audio uses the `audio` background mode. Live Activities use the widge
 
 Search the repo for `com.moonlightlofi` if these ids should change before you create the App Store records. The widget bundle id has to stay prefixed by the app bundle id.
 
-## Add a track
+## Tracks
 
-The shipped audio is a few seconds of generated tone so the player, lock screen, and download path work before masters exist. You own the rights to the music that replaces it. Do not ship the tones as the catalog.
+The app ships eleven original loops by Moonlight Lofi. They are AAC, 256 kbps, 44.1 kHz, 150 seconds, normalized to −14 LUFS, and written so the end joins the start. Free tracks are Rainy Window, Midnight Tea, Notebook Margins, and Sleepy Cat Nap. The other seven are Pro. A fresh install uses Loop one, which repeats the current file with `AVPlayerLooper` instead of seeking back to zero.
 
-1. Put an `.mp3`, `.m4a`, `.aac`, `.wav`, `.aiff`, or `.caf` in `MoonlightLofi/Resources/Audio/`.
-2. Add an object to `MoonlightLofi/Resources/Catalog/tracks.json`:
+Ownership is recorded in `tools/lofi-gen/MUSIC_LICENSE.md`. The generator (`lofi_gen.py`, `make_track.sh`, `batch.txt`) synthesizes the music from oscillators and noise. It does not use samples.
+
+To add another track:
+
+1. Render an `.m4a` with `tools/lofi-gen/make_track.sh`, or export your own master.
+2. Put the file in `MoonlightLofi/Resources/Audio/` and add an object to `tracks.json`:
 
 ```json
 {
   "id": "paper-lanterns",
   "title": "Paper Lanterns",
+  "artist": "Moonlight Lofi",
   "mood": "mood.softKeys",
-  "duration": 192,
+  "key": "D",
+  "bpm": 80,
+  "duration": 150,
   "bundledFile": "paper-lanterns.m4a",
-  "isPro": true
+  "isPro": true,
+  "seamless": true
 }
 ```
 
 3. `id` is lowercase letters, digits, and hyphens. It becomes the filename in Application Support, so keep it unique.
-4. `mood` is a localization key (`mood.softKeys` and the others in `Shared/Resources`). Add a key if you need a new mood.
-5. `duration` is seconds. The player replaces it with the asset duration once the file loads.
-6. `isPro: false` puts the track on the free plan.
+4. `mood` and `key.*` are localization keys in `Shared/Resources`. Add a key if you need a new mood or spelling.
+5. `duration` is seconds. The player replaces it with the asset duration once the file loads. `scripts/validate_catalog.py` checks it against the file within half a second.
+6. `isPro: false` puts the track on the free plan. `seamless: true` is what turns Loop one into a gapless repeat.
 7. Rebuild. Bundled files play without a download. Pro users can still copy them offline from the download button.
 
-To stream instead of bundling, omit `bundledFile` and set an https URL. Leave `placeholder` off once the file is real:
-
-```json
-{
-  "id": "harbor-lights",
-  "title": "Harbor Lights",
-  "mood": "mood.harbor",
-  "duration": 180,
-  "fileURL": "https://cdn.example.com/harbor-lights.mp3",
-  "isPro": true
-}
-```
-
-`harbor-lights` and `paper-moon` in the sample catalog are placeholders on `example.com`. They show "Add audio" and do not play. `scripts/validate_catalog.py` checks that every bundled filename exists and that remote URLs are https.
-
-Regenerate the sample tones and icon with:
-
-```bash
-python3 scripts/generate_placeholders.py
-```
+To stream instead of bundling, omit `bundledFile` and set an https URL. Do not mark the row `placeholder`; the catalog check rejects those rows.
 
 ## Scenes
 

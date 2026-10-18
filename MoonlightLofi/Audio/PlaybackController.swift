@@ -23,7 +23,8 @@ final class PlaybackController {
     var onTrackStarted: (String) -> Void = { _ in }
     var onSleepChanged: (SleepPlan?) -> Void = { _ in }
 
-    private let player = AVPlayer()
+    private let player = AVQueuePlayer()
+    private var looper: AVPlayerLooper?
     private let bridge = Bridge()
     private var timeObserver: Any?
     private var endObserver: NSObjectProtocol?
@@ -34,6 +35,7 @@ final class PlaybackController {
 
     init() {
         bridge.owner = self
+        player.automaticallyWaitsToMinimizeStalling = false
         configureSession()
         configureCommands()
         observeTime()
@@ -60,11 +62,7 @@ final class PlaybackController {
             return
         }
         activateSession()
-        let item = AVPlayerItem(url: url)
-        observeStatus(of: item)
-        player.replaceCurrentItem(with: item)
-        player.volume = Float(sleepPlan?.volume(at: Date()) ?? 1)
-        player.play()
+        install(url: url, seamless: track.seamless && loop == .one, resumeAt: 0, autoplay: true)
         current = track
         isPlaying = true
         currentTime = 0
@@ -145,6 +143,19 @@ final class PlaybackController {
 
     func cycleLoop() {
         loop = loop.next
+        guard let track = current, let url = resolvedURL(for: track), looper != nil || player.currentItem != nil else {
+            return
+        }
+        let seconds = player.currentTime().seconds
+        let resume = seconds.isFinite ? max(0, seconds) : currentTime
+        install(
+            url: url,
+            seamless: track.seamless && loop == .one,
+            resumeAt: resume,
+            autoplay: isPlaying
+        )
+        currentTime = resume
+        updateNowPlaying()
     }
 
     func startSleep(minutes: Int, fadeMinutes: Int) {
@@ -175,6 +186,30 @@ final class PlaybackController {
     private func clearSleep() {
         sleepPlan = nil
         onSleepChanged(nil)
+    }
+
+    /// Loop one on a seamless file uses `AVPlayerLooper`, so the join is not a seek back to zero.
+    private func install(url: URL, seamless: Bool, resumeAt: TimeInterval, autoplay: Bool) {
+        looper?.disableLooping()
+        looper = nil
+        player.removeAllItems()
+        let item = AVPlayerItem(url: url)
+        observeStatus(of: item)
+        if seamless {
+            looper = AVPlayerLooper(player: player, templateItem: item)
+        } else {
+            player.insert(item, after: nil)
+        }
+        player.volume = Float(sleepPlan?.volume(at: Date()) ?? 1)
+        if resumeAt > 0.05 {
+            let time = CMTime(seconds: resumeAt, preferredTimescale: 600)
+            player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
+        }
+        if autoplay {
+            player.play()
+        } else {
+            player.pause()
+        }
     }
 
     private func resolvedURL(for track: Track) -> URL? {
@@ -342,6 +377,7 @@ final class PlaybackController {
     }
 
     private func handleEnded() {
+        if looper != nil { return }
         let ids = queueIDs()
         guard
             let next = PlaybackOrder.nextID(
@@ -388,7 +424,7 @@ final class PlaybackController {
         }
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: current.title,
-            MPMediaItemPropertyArtist: "Moonlight Lofi",
+            MPMediaItemPropertyArtist: current.artist,
             MPMediaItemPropertyPlaybackDuration: duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
             MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0

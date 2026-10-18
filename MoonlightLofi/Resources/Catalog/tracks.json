@@ -1,47 +1,137 @@
 {
-  "notes": "Bundled files are short generated tones so the player runs before real masters are added. Replace them, or point fileURL at an https host you control. See the README.",
+  "notes": "Original seamless loops synthesized in tools/lofi-gen. AAC 256 kbps, 150 seconds, −14 LUFS. See tools/lofi-gen/MUSIC_LICENSE.md.",
   "tracks": [
     {
-      "id": "midnight-kettle",
-      "title": "Midnight Kettle",
-      "mood": "mood.softKeys",
-      "duration": 10,
-      "bundledFile": "midnight-kettle.wav",
-      "isPro": false
-    },
-    {
-      "id": "window-rain",
-      "title": "Window Rain",
+      "id": "rainy-window",
+      "title": "Rainy Window",
+      "artist": "Moonlight Lofi",
       "mood": "mood.rainGlass",
-      "duration": 10,
-      "bundledFile": "window-rain.wav",
-      "isPro": false
+      "key": "D",
+      "bpm": 80,
+      "duration": 150,
+      "bundledFile": "rainy-window.m4a",
+      "isPro": false,
+      "seamless": true
     },
     {
-      "id": "violet-hour",
-      "title": "Violet Hour",
-      "mood": "mood.violetDusk",
-      "duration": 10,
-      "bundledFile": "violet-hour.wav",
-      "isPro": true
+      "id": "midnight-tea",
+      "title": "Midnight Tea",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.softKeys",
+      "key": "F",
+      "bpm": 76,
+      "duration": 150,
+      "bundledFile": "midnight-tea.m4a",
+      "isPro": false,
+      "seamless": true
     },
     {
-      "id": "harbor-lights",
-      "title": "Harbor Lights",
-      "mood": "mood.harbor",
-      "duration": 180,
-      "fileURL": "https://example.com/moonlight-lofi/harbor-lights.mp3",
+      "id": "streetlight-drift",
+      "title": "Streetlight Drift",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.streetlight",
+      "key": "A",
+      "bpm": 84,
+      "duration": 150,
+      "bundledFile": "streetlight-drift.m4a",
       "isPro": true,
-      "placeholder": true
+      "seamless": true
     },
     {
-      "id": "paper-moon",
-      "title": "Paper Moon",
-      "mood": "mood.paperMoon",
-      "duration": 200,
-      "fileURL": "https://example.com/moonlight-lofi/paper-moon.mp3",
+      "id": "slow-moon-rising",
+      "title": "Slow Moon Rising",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.moonrise",
+      "key": "Eb",
+      "bpm": 72,
+      "duration": 150,
+      "bundledFile": "slow-moon-rising.m4a",
       "isPro": true,
-      "placeholder": true
+      "seamless": true
+    },
+    {
+      "id": "rooftop-breeze",
+      "title": "Rooftop Breeze",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.breeze",
+      "key": "G",
+      "bpm": 82,
+      "duration": 150,
+      "bundledFile": "rooftop-breeze.m4a",
+      "isPro": true,
+      "seamless": true
+    },
+    {
+      "id": "notebook-margins",
+      "title": "Notebook Margins",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.notebook",
+      "key": "C",
+      "bpm": 78,
+      "duration": 150,
+      "bundledFile": "notebook-margins.m4a",
+      "isPro": false,
+      "seamless": true
+    },
+    {
+      "id": "last-train-home",
+      "title": "Last Train Home",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.nightTrain",
+      "key": "Bb",
+      "bpm": 86,
+      "duration": 150,
+      "bundledFile": "last-train-home.m4a",
+      "isPro": true,
+      "seamless": true
+    },
+    {
+      "id": "sleepy-cat-nap",
+      "title": "Sleepy Cat Nap",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.catNap",
+      "key": "E",
+      "bpm": 74,
+      "duration": 150,
+      "bundledFile": "sleepy-cat-nap.m4a",
+      "isPro": false,
+      "seamless": true
+    },
+    {
+      "id": "fogged-glass",
+      "title": "Fogged Glass",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.fog",
+      "key": "Ab",
+      "bpm": 80,
+      "duration": 150,
+      "bundledFile": "fogged-glass.m4a",
+      "isPro": true,
+      "seamless": true
+    },
+    {
+      "id": "neon-puddles",
+      "title": "Neon Puddles",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.neon",
+      "key": "B",
+      "bpm": 83,
+      "duration": 150,
+      "bundledFile": "neon-puddles.m4a",
+      "isPro": true,
+      "seamless": true
+    },
+    {
+      "id": "lantern-glow",
+      "title": "Lantern Glow",
+      "artist": "Moonlight Lofi",
+      "mood": "mood.lantern",
+      "key": "Db",
+      "bpm": 75,
+      "duration": 150,
+      "bundledFile": "lantern-glow.m4a",
+      "isPro": true,
+      "seamless": true
     }
   ]
 }

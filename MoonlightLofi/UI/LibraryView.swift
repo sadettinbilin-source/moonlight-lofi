@@ -34,6 +34,17 @@ struct LibraryView: View {
         }
     }
 
+    private func subtitle(_ track: Track) -> String {
+        var parts = [L10n.tr(track.mood)]
+        if let key = track.musicalKey {
+            parts.append(L10n.tr("key.\(key)"))
+        }
+        if let bpm = track.bpm {
+            parts.append(L10n.tr("meta.bpm", bpm))
+        }
+        return parts.joined(separator: " · ")
+    }
+
     private func trackRow(_ track: Track) -> some View {
         let locked = track.isPro && !model.isPro
         let current = model.playback.current?.id == track.id
@@ -48,7 +59,7 @@ struct LibraryView: View {
                     Text(track.title)
                         .font(.system(.body, design: .rounded).weight(.medium))
                         .foregroundStyle(Palette.text)
-                    Text(LocalizedStringKey(track.mood))
+                    Text(subtitle(track))
                         .font(.system(.caption, design: .rounded))
                         .foregroundStyle(Palette.muted)
                 }

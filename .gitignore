@@ -7,3 +7,4 @@ xcuserdata/
 .swiftpm/
 Packages/MoonlightCore/.build/
 .idea/
+staging/
