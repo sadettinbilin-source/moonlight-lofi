@@ -1,0 +1,120 @@
+name: MoonlightLofi
+options:
+  bundleIdPrefix: com.moonlightlofi
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: en
+  knownRegions:
+    - en
+    - de
+    - Base
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+packages:
+  MoonlightCore:
+    path: Packages/MoonlightCore
+schemes:
+  MoonlightLofi:
+    build:
+      targets:
+        MoonlightLofi: all
+        MoonlightLofiWidget: all
+        MoonlightLofiTests: [test]
+    run:
+      config: Debug
+      storeKitConfiguration: MoonlightLofi/Resources/Products.storekit
+    test:
+      config: Debug
+      targets:
+        - MoonlightLofiTests
+targets:
+  MoonlightLofi:
+    type: application
+    platform: iOS
+    sources:
+      - path: MoonlightLofi/App
+      - path: MoonlightLofi/Audio
+      - path: MoonlightLofi/Timer
+      - path: MoonlightLofi/Store
+      - path: MoonlightLofi/Stats
+      - path: MoonlightLofi/Scenes
+      - path: MoonlightLofi/UI
+      - path: Shared
+        excludes:
+          - Resources/**
+    resources:
+      - path: MoonlightLofi/Resources/Catalog/tracks.json
+      - path: MoonlightLofi/Resources/Audio
+        type: folder
+      - path: MoonlightLofi/Resources/Assets.xcassets
+      - path: Shared/Resources/en.lproj
+        type: folder
+      - path: Shared/Resources/de.lproj
+        type: folder
+      - path: MoonlightLofi/PrivacyInfo.xcprivacy
+    dependencies:
+      - package: MoonlightCore
+        product: MoonlightCore
+      - target: MoonlightLofiWidget
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.moonlightlofi.app
+        INFOPLIST_FILE: MoonlightLofi/Info.plist
+        CODE_SIGN_ENTITLEMENTS: MoonlightLofi/MoonlightLofi.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TARGETED_DEVICE_FAMILY: "1,2"
+  MoonlightLofiWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: MoonlightLofiWidget
+        excludes:
+          - Info.plist
+          - "*.entitlements"
+          - PrivacyInfo.xcprivacy
+      - path: Shared
+        excludes:
+          - Resources/**
+    resources:
+      - path: Shared/Resources/en.lproj
+        type: folder
+      - path: Shared/Resources/de.lproj
+        type: folder
+      - path: MoonlightLofiWidget/PrivacyInfo.xcprivacy
+    dependencies:
+      - package: MoonlightCore
+        product: MoonlightCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.moonlightlofi.app.widget
+        INFOPLIST_FILE: MoonlightLofiWidget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: MoonlightLofiWidget/MoonlightLofiWidget.entitlements
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+  MoonlightLofiTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Packages/MoonlightCore/Tests/MoonlightCoreTests
+    dependencies:
+      - target: MoonlightLofi
+      - package: MoonlightCore
+        product: MoonlightCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.moonlightlofi.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/MoonlightLofi.app/MoonlightLofi"
+        BUNDLE_LOADER: "$(TEST_HOST)"

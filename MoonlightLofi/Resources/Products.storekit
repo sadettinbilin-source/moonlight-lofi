@@ -1,0 +1,166 @@
+{
+  "identifier" : "MoonlightPro",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "29.99",
+      "familyShareable" : false,
+      "internalID" : "LIFETIME001",
+      "localizations" : [
+        {
+          "description" : "Unlock every track, scene, download, and your focus stats. Yours to keep.",
+          "displayName" : "Moonlight Pro Lifetime",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Schalte jeden Titel, jede Szene, Downloads und die Fokus-Statistik frei. Für immer.",
+          "displayName" : "Moonlight Pro Lebenslang",
+          "locale" : "de_DE"
+        }
+      ],
+      "productID" : "com.moonlightlofi.pro.lifetime",
+      "referenceName" : "Moonlight Pro Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "1111111111",
+    "_developerTeamID" : "TEAMID1234",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21482001",
+      "localizations" : [
+        {
+          "description" : "The full Moonlight Lofi night.",
+          "displayName" : "Moonlight Pro",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Die ganze Moonlight-Lofi-Nacht.",
+          "displayName" : "Moonlight Pro",
+          "locale" : "de_DE"
+        }
+      ],
+      "name" : "Moonlight Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "MONTHLY001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Full catalog, downloads, every scene, and focus stats, billed monthly.",
+              "displayName" : "Moonlight Pro Monthly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Voller Katalog, Downloads, alle Szenen und die Fokus-Statistik, monatlich.",
+              "displayName" : "Moonlight Pro Monatlich",
+              "locale" : "de_DE"
+            }
+          ],
+          "productID" : "com.moonlightlofi.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Moonlight Pro Monthly",
+          "subscriptionGroupID" : "21482001",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "YEARLY001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Full catalog, downloads, every scene, and focus stats, billed yearly.",
+              "displayName" : "Moonlight Pro Yearly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Voller Katalog, Downloads, alle Szenen und die Fokus-Statistik, jährlich.",
+              "displayName" : "Moonlight Pro Jährlich",
+              "locale" : "de_DE"
+            }
+          ],
+          "productID" : "com.moonlightlofi.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Moonlight Pro Yearly",
+          "subscriptionGroupID" : "21482001",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

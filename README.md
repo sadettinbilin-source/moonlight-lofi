@@ -1,3 +1,158 @@
-# New project
+# Moonlight Lofi
 
-This project was created by a Cursor cloud agent.
+The official iOS app for the lofi channel [@moonlight-lofii](https://www.youtube.com/@moonlight-lofii). It plays the creator's own tracks, keeps a date-based focus timer, and sells Moonlight Pro with StoreKit 2. There is no account and no backend. Purchases, stats, and downloads stay on the device.
+
+Swift 5.9, SwiftUI, iOS 17 and later.
+
+## Features
+
+- Player for a JSON catalog, with shuffle, loop, lock screen controls, and background audio.
+- Offline copies in Application Support (`MoonlightTracks`). Downloads are part of Pro.
+- Focus timer with custom focus, short break, and long break lengths. Remaining time is `endDate - now`, so leaving the app does not drift the clock.
+- A local notification when a phase ends, a Live Activity (Lock Screen and Dynamic Island), and a Home Screen widget.
+- Sleep timer that eases the player's volume to silence, then stops. A dark screen hides the UI.
+- Five night scenes drawn in SwiftUI. Moon Garden is free. The other four are Pro.
+- Pro unlocks the full catalog, downloads, every scene, and focus stats. Free keeps the tracks marked `isPro: false` and Moon Garden. The timer itself is free.
+- Focus minutes and the day streak are stored with SwiftData.
+- English and German, following the system language.
+
+## Architecture
+
+```text
+Packages/MoonlightCore     Pure Foundation logic and the unit tests
+MoonlightLofi              SwiftUI app: audio, StoreKit, SwiftData, scenes
+Shared                     Colors, strings, widget snapshot, Live Activity attributes
+MoonlightLofiWidget        Home Screen widget and Live Activity
+```
+
+`MoonlightCore` does not import UIKit, StoreKit, or SwiftData, so `swift test` covers it on a Mac or a Linux CI runner.
+
+| Piece | Responsibility |
+| --- | --- |
+| `FocusTimerEngine` | Start, pause, resume, and complete phases from dates. One in-flight interval is settled when the app returns. Missed breaks are not replayed. If auto-continue is on and the app notices the end within 15 seconds, the next phase starts. |
+| `SleepPlan` | Volume from the clock. Full volume until the fade window, then a cosine ease to silence. |
+| `EntitlementPolicy` | What Free and Pro may play, download, and open. StoreKit only answers "which product ids are active?" |
+| `CatalogDecoder` | `tracks.json`: safe ids, https URLs, bundled file or remote URL. |
+| `PlaybackController` | `AVPlayer`, Now Playing, remote commands, and the sleep fade while audio is playing. |
+| `DownloadManager` | Copies a bundled file, or downloads an https URL, into Application Support. |
+| `StoreManager` | Loads products, purchases, restores with `AppStore.sync()`, and listens to `Transaction.updates`. |
+| `FocusSessionRecord` | SwiftData row for a finished focus interval. The streak treats today, or yesterday if today is still empty, as the live end of the run. |
+| Widget | Reads a `WidgetSnapshot` from the App Group. The countdown is `Text(timerInterval:)`, not a one-second timeline. |
+
+Free sessions are still saved. The stats screen and the widget's streak stay behind Pro until a purchase or restore, then the minutes already on the device show up.
+
+## Project layout
+
+XcodeGen is the source of the Xcode project. `project.yml` describes the app, the widget extension, the test bundle, and the shared scheme. The scheme points at `MoonlightLofi/Resources/Products.storekit`.
+
+```bash
+brew install xcodegen
+xcodegen generate
+open MoonlightLofi.xcodeproj
+```
+
+## Build and sign
+
+1. Install Xcode 15 or newer so the iOS 17 SDK is available.
+2. Generate the project with the commands above.
+3. Select the `MoonlightLofi` scheme. Signing & Capabilities on **both** the app and the widget need your Team.
+4. Create an App Group with id `group.com.moonlightlofi.shared` and attach it to both App IDs. The entitlements files already request it. If you change the id, update both entitlements files and `AppGroupID.suite` in `Packages/MoonlightCore`.
+5. Register the bundle ids before you ship:
+   - App: `com.moonlightlofi.app`
+   - Widget: `com.moonlightlofi.app.widget`
+6. Run on an iPhone simulator (Dynamic Island needs a 14 Pro or later) or a device.
+
+Background audio uses the `audio` background mode. Live Activities use the widget extension and `NSSupportsLiveActivities`. Neither needs a server.
+
+Search the repo for `com.moonlightlofi` if these ids should change before you create the App Store records. The widget bundle id has to stay prefixed by the app bundle id.
+
+## Add a track
+
+The shipped audio is a few seconds of generated tone so the player, lock screen, and download path work before masters exist. You own the rights to the music that replaces it. Do not ship the tones as the catalog.
+
+1. Put an `.mp3`, `.m4a`, `.aac`, `.wav`, `.aiff`, or `.caf` in `MoonlightLofi/Resources/Audio/`.
+2. Add an object to `MoonlightLofi/Resources/Catalog/tracks.json`:
+
+```json
+{
+  "id": "paper-lanterns",
+  "title": "Paper Lanterns",
+  "mood": "mood.softKeys",
+  "duration": 192,
+  "bundledFile": "paper-lanterns.m4a",
+  "isPro": true
+}
+```
+
+3. `id` is lowercase letters, digits, and hyphens. It becomes the filename in Application Support, so keep it unique.
+4. `mood` is a localization key (`mood.softKeys` and the others in `Shared/Resources`). Add a key if you need a new mood.
+5. `duration` is seconds. The player replaces it with the asset duration once the file loads.
+6. `isPro: false` puts the track on the free plan.
+7. Rebuild. Bundled files play without a download. Pro users can still copy them offline from the download button.
+
+To stream instead of bundling, omit `bundledFile` and set an https URL. Leave `placeholder` off once the file is real:
+
+```json
+{
+  "id": "harbor-lights",
+  "title": "Harbor Lights",
+  "mood": "mood.harbor",
+  "duration": 180,
+  "fileURL": "https://cdn.example.com/harbor-lights.mp3",
+  "isPro": true
+}
+```
+
+`harbor-lights` and `paper-moon` in the sample catalog are placeholders on `example.com`. They show "Add audio" and do not play. `scripts/validate_catalog.py` checks that every bundled filename exists and that remote URLs are https.
+
+Regenerate the sample tones and icon with:
+
+```bash
+python3 scripts/generate_placeholders.py
+```
+
+## App Store Connect products
+
+Create these in App Store Connect with the same product ids. Prices are the intended US prices; the app displays whatever StoreKit returns.
+
+| Product id | Type | Duration | Reference price |
+| --- | --- | --- | --- |
+| `com.moonlightlofi.pro.monthly` | Auto-renewable subscription | 1 month | 2.99 USD |
+| `com.moonlightlofi.pro.yearly` | Auto-renewable subscription | 1 year | 19.99 USD |
+| `com.moonlightlofi.pro.lifetime` | Non-consumable | — | 29.99 USD |
+
+Put the monthly and yearly products in one subscription group named **Moonlight Pro**. Yearly is the highlighted plan in the paywall.
+
+Local testing uses `MoonlightLofi/Resources/Products.storekit`, already selected on the `MoonlightLofi` scheme. In the simulator you can buy from the paywall without an Apple ID. Restore calls `AppStore.sync()`. Terms and privacy open placeholder pages (`https://moonlightlofi.app/terms` and `https://moonlightlofi.app/privacy`); replace those URLs in `Links` before release.
+
+## Localization
+
+Strings live in `Shared/Resources/en.lproj` and `de.lproj` and are copied into both the app and the widget as folder references, which is what `NSLocalizedString` looks up. The system language picks the table. If a screen shows raw keys such as `tab.listen`, confirm both `.lproj` folders are in Copy Bundle Resources. Add a language by copying `en.lproj`, translating, and listing the code in `project.yml` (`knownRegions`) and `CFBundleLocalizations`.
+
+## Tests
+
+Timer, sleep fade, entitlements, catalog decoding, queue order, streaks, and English/German key parity:
+
+```bash
+swift test --package-path Packages/MoonlightCore
+python3 scripts/validate_catalog.py
+```
+
+After `xcodegen generate`, the same tests also run as the `MoonlightLofiTests` bundle:
+
+```bash
+xcodebuild test \
+  -project MoonlightLofi.xcodeproj \
+  -scheme MoonlightLofi \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -only-testing:MoonlightLofiTests
+```
+
+GitHub Actions (`.github/workflows/ios.yml`) runs the catalog check, `swift test`, generates the project, and runs the hosted tests on `macos-latest`.
+
+## Capabilities to confirm in Xcode
+
+- Signing team on the app and the widget
+- App Group `group.com.moonlightlofi.shared` on both
+- Background Modes → Audio, AirPlay, and Picture in Picture (the plist already includes `audio`)
+- In-App Purchase (StoreKit does not need an extra entitlement for these products)

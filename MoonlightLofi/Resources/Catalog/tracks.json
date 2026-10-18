@@ -1,0 +1,47 @@
+{
+  "notes": "Bundled files are short generated tones so the player runs before real masters are added. Replace them, or point fileURL at an https host you control. See the README.",
+  "tracks": [
+    {
+      "id": "midnight-kettle",
+      "title": "Midnight Kettle",
+      "mood": "mood.softKeys",
+      "duration": 10,
+      "bundledFile": "midnight-kettle.wav",
+      "isPro": false
+    },
+    {
+      "id": "window-rain",
+      "title": "Window Rain",
+      "mood": "mood.rainGlass",
+      "duration": 10,
+      "bundledFile": "window-rain.wav",
+      "isPro": false
+    },
+    {
+      "id": "violet-hour",
+      "title": "Violet Hour",
+      "mood": "mood.violetDusk",
+      "duration": 10,
+      "bundledFile": "violet-hour.wav",
+      "isPro": true
+    },
+    {
+      "id": "harbor-lights",
+      "title": "Harbor Lights",
+      "mood": "mood.harbor",
+      "duration": 180,
+      "fileURL": "https://example.com/moonlight-lofi/harbor-lights.mp3",
+      "isPro": true,
+      "placeholder": true
+    },
+    {
+      "id": "paper-moon",
+      "title": "Paper Moon",
+      "mood": "mood.paperMoon",
+      "duration": 200,
+      "fileURL": "https://example.com/moonlight-lofi/paper-moon.mp3",
+      "isPro": true,
+      "placeholder": true
+    }
+  ]
+}
