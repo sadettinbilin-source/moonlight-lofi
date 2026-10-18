@@ -28,11 +28,11 @@ final class EntitlementTests: XCTestCase {
         XCTAssertTrue(EntitlementPolicy.canViewStats(userIsPro: true))
     }
 
-    func testOnlyMoonGardenIsFree() {
-        let free = AmbientScene.allCases.filter { !$0.isPro }
-        XCTAssertEqual(free, [.moonGarden])
-        XCTAssertEqual(AmbientScene.allCases.count, 5)
+    func testFreeScenesStayOpenWithoutPro() {
+        XCTAssertFalse(AmbientScene.lunaStudy.isPro)
+        XCTAssertFalse(AmbientScene.moonGarden.isPro)
         XCTAssertFalse(EntitlementPolicy.canUseScene(sceneIsPro: AmbientScene.rainWindow.isPro, userIsPro: false))
+        XCTAssertTrue(EntitlementPolicy.canUseScene(sceneIsPro: AmbientScene.lunaStudy.isPro, userIsPro: false))
         XCTAssertTrue(EntitlementPolicy.canUseScene(sceneIsPro: AmbientScene.moonGarden.isPro, userIsPro: false))
     }
 }

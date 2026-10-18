@@ -7,7 +7,11 @@ struct NowView: View {
 
     var body: some View {
         ZStack {
-            SceneBackdrop(scene: model.activeScene)
+            if model.activeScene.isIllustrated {
+                IllustratedScene(scene: model.activeScene)
+            } else {
+                SceneBackdrop(scene: model.activeScene)
+            }
             LinearGradient(
                 colors: [.clear, .black.opacity(0.15), .black.opacity(0.72)],
                 startPoint: .top,
@@ -46,35 +50,93 @@ struct NowView: View {
     }
 
     private var scenePicker: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(AmbientScene.allCases) { scene in
-                    let locked = scene.isPro && !model.isPro
-                    let selected = scene == model.activeScene
-                    Button {
-                        model.select(scene: scene)
-                    } label: {
-                        HStack(spacing: 6) {
-                            if locked {
-                                Image(systemName: "lock.fill")
-                                    .font(.caption2)
-                            }
-                            Text(LocalizedStringKey(scene.titleKey))
-                                .font(.system(.subheadline, design: .rounded))
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .foregroundStyle(selected ? Palette.ink : Palette.text)
-                        .background(selected ? Palette.moon : Color.white.opacity(0.08), in: Capsule())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(LocalizedStringKey(scene.titleKey)))
-                    .accessibilityHint(Text(locked ? "scene.locked" : ""))
-                }
+        VStack(alignment: .leading, spacing: 10) {
+            if model.offersSleepScene {
+                sleepSuggestion
             }
-            .padding(.horizontal, 2)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 10) {
+                    ForEach(AmbientScene.allCases) { scene in
+                        sceneChip(scene)
+                    }
+                }
+                .padding(.horizontal, 2)
+                .padding(.vertical, 2)
+            }
         }
         .accessibilityLabel(Text("a11y.scenes"))
+    }
+
+    private var sleepSuggestion: some View {
+        HStack(spacing: 10) {
+            Text("scene.sleepSuggest")
+                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(Palette.text)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button {
+                model.acceptSleepScene()
+            } label: {
+                Text("scene.sleepSuggest.use")
+                    .font(.system(.footnote, design: .rounded).weight(.semibold))
+                    .foregroundStyle(Palette.ink)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Palette.moon, in: Capsule())
+            }
+            .buttonStyle(.plain)
+            Button {
+                model.dismissSleepScene()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Palette.muted)
+                    .frame(width: 28, height: 28)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("scene.sleepSuggest.dismiss"))
+        }
+        .padding(.leading, 12)
+        .padding(.trailing, 6)
+        .padding(.vertical, 6)
+        .background(Color.black.opacity(0.38), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func sceneChip(_ scene: AmbientScene) -> some View {
+        let locked = scene.isPro && !model.isPro
+        let selected = scene == model.activeScene
+        return Button {
+            model.select(scene: scene)
+        } label: {
+            VStack(spacing: 6) {
+                ZStack(alignment: .topTrailing) {
+                    SceneThumbnail(scene: scene)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .strokeBorder(selected ? Palette.moon : Color.white.opacity(0.2), lineWidth: selected ? 2 : 1)
+                        }
+                    if locked {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(Palette.text)
+                            .padding(5)
+                            .background(Color.black.opacity(0.55), in: Circle())
+                            .padding(5)
+                    }
+                }
+                Text(LocalizedStringKey(scene.titleKey))
+                    .font(.system(size: 11, weight: selected ? .semibold : .regular, design: .rounded))
+                    .foregroundStyle(selected ? Palette.moon : Palette.text)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .frame(width: 76)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(LocalizedStringKey(scene.titleKey)))
+        .accessibilityHint(Text(locked ? "scene.locked" : ""))
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     private var trackBlock: some View {

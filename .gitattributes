@@ -1,3 +1,4 @@
 *.wav binary
 *.png binary
+*.jpg binary
 *.storekit text eol=lf

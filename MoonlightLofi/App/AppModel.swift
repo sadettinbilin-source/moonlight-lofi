@@ -19,6 +19,7 @@ final class AppModel {
     var showPaywall = false
     var showSleep = false
     var showDark = false
+    private(set) var sleepSceneDismissed = false
     var alertKey: String?
     var restoreNote = false
     var notificationOn: Bool?
@@ -39,8 +40,8 @@ final class AppModel {
         focus = FocusTimerController()
         store = StoreManager()
 
-        let storedScene = defaults.string(forKey: Prefs.scene) ?? AmbientScene.moonGarden.rawValue
-        selectedScene = AmbientScene(rawValue: storedScene) ?? .moonGarden
+        let storedScene = defaults.string(forKey: Prefs.scene) ?? AmbientScene.defaultScene.rawValue
+        selectedScene = AmbientScene(rawValue: storedScene) ?? .defaultScene
 
         if defaults.object(forKey: Prefs.shuffle) != nil {
             playback.shuffle = defaults.bool(forKey: Prefs.shuffle)
@@ -72,6 +73,7 @@ final class AppModel {
                 self.defaults.set(data, forKey: Prefs.sleep)
             } else {
                 self.defaults.removeObject(forKey: Prefs.sleep)
+                self.sleepSceneDismissed = false
             }
         }
         focus.statsProvider = { [weak self] in
@@ -98,7 +100,23 @@ final class AppModel {
         if EntitlementPolicy.canUseScene(sceneIsPro: selectedScene.isPro, userIsPro: store.isPro) {
             return selectedScene
         }
-        return .moonGarden
+        return .defaultScene
+    }
+
+    var offersSleepScene: Bool {
+        SleepSceneOffer.shouldOffer(
+            sleepTimerActive: playback.sleepPlan != nil,
+            selected: selectedScene,
+            dismissed: sleepSceneDismissed
+        )
+    }
+
+    func acceptSleepScene() {
+        select(scene: SleepSceneOffer.scene)
+    }
+
+    func dismissSleepScene() {
+        sleepSceneDismissed = true
     }
 
     func attach(context: ModelContext) {

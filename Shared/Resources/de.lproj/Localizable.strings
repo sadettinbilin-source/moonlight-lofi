@@ -58,7 +58,7 @@
 "paywall.benefit.downloads" = "Offline-Downloads";
 "paywall.benefit.downloads.detail" = "Titel für Zug, Flug und Räume ohne Empfang sichern.";
 "paywall.benefit.scenes" = "Alle Nachtszenen";
-"paywall.benefit.scenes.detail" = "Regen, Stadtlichter, Polarlicht und das Ufer.";
+"paywall.benefit.scenes.detail" = "Luna schläft, das Dach, Regen, Stadtlichter, Polarlicht und das Ufer.";
 "paywall.benefit.stats" = "Fokus-Statistik";
 "paywall.benefit.stats.detail" = "Minuten und Serien, nur auf diesem Gerät.";
 "paywall.bestValue" = "Bester Preis";
@@ -86,8 +86,14 @@
 "scene.aurora" = "Polarlicht";
 "scene.cityWindow" = "Stadtfenster";
 "scene.locked" = "Pro-Szene";
+"scene.lunaRooftop" = "Luna auf dem Dach";
+"scene.lunaSleep" = "Luna schläft";
+"scene.lunaStudy" = "Luna lernt";
 "scene.moonGarden" = "Mondgarten";
 "scene.rainWindow" = "Regenfenster";
+"scene.sleepSuggest" = "Luna passt auf, während du schläfst";
+"scene.sleepSuggest.dismiss" = "Vorschlag schließen";
+"scene.sleepSuggest.use" = "Luna schläft zeigen";
 "scene.starlitShore" = "Sternenufer";
 "sleep.active" = "Schlaftimer läuft";
 "sleep.cancel" = "Schlaftimer aus";

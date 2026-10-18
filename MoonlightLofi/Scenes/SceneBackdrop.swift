@@ -2,16 +2,32 @@ import SwiftUI
 
 struct SceneBackdrop: View {
     var scene: AmbientScene
+    var still: Bool = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    private var paused: Bool { still || reduceMotion }
+
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion)) { timeline in
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: paused)) { timeline in
             Canvas { context, size in
-                draw(scene, in: context, size: size, date: timeline.date, animated: !reduceMotion)
+                draw(scene, in: context, size: size, date: timeline.date, animated: !paused)
             }
         }
-        .ignoresSafeArea()
+        .modifier(BleedToEdges(enabled: !still))
         .accessibilityHidden(true)
+    }
+}
+
+private struct BleedToEdges: ViewModifier {
+    var enabled: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if enabled {
+            content.ignoresSafeArea()
+        } else {
+            content
+        }
     }
 }
 
@@ -24,6 +40,8 @@ private func draw(
 ) {
     let time = animated ? date.timeIntervalSinceReferenceDate : 0
     switch scene {
+    case .lunaStudy, .lunaSleep, .lunaRooftop:
+        fillGradient(context, size, top: rgb(0.07, 0.07, 0.14), bottom: rgb(0.03, 0.04, 0.08))
     case .moonGarden:
         drawMoonGarden(context, size, time)
     case .rainWindow:
@@ -244,6 +262,42 @@ private func fillGlow(_ context: GraphicsContext, center: CGPoint, radius: CGFlo
 
 private func rgb(_ red: Double, _ green: Double, _ blue: Double) -> Color {
     Color(red: red, green: green, blue: blue)
+}
+
+func drawNightParticles(
+    _ context: GraphicsContext,
+    size: CGSize,
+    time: TimeInterval,
+    animated: Bool,
+    starCount: Int,
+    rainCount: Int
+) {
+    var layer = context
+    layer.opacity = 0.42
+    for index in 0..<starCount {
+        let seed = Double(index) + 1.3
+        let twinkle = animated ? 0.35 + 0.65 * abs(sin(time * 0.7 + seed)) : 0.7
+        let radius = 0.7 + unit(seed + 5) * 1.3
+        fillCircle(
+            layer,
+            center: CGPoint(x: unit(seed) * size.width, y: unit(seed + 2.2) * size.height * 0.72),
+            radius: radius,
+            color: Color.white.opacity(twinkle)
+        )
+    }
+    let drops = animated ? rainCount : max(4, rainCount / 2)
+    for index in 0..<drops {
+        let seed = Double(index) + 0.6
+        let x = unit(seed + 0.4) * size.width
+        let length = 10 + unit(seed + 2) * 14
+        let speed = 70 + unit(seed + 3) * 50
+        let travel = animated ? time * speed + Double(index) * 41 : Double(index) * 28
+        let y = CGFloat(travel.truncatingRemainder(dividingBy: Double(size.height)))
+        var line = Path()
+        line.move(to: CGPoint(x: x, y: y))
+        line.addLine(to: CGPoint(x: x - 2.5, y: y + length))
+        layer.stroke(line, with: .color(Color.white.opacity(0.55)), lineWidth: 1)
+    }
 }
 
 private func unit(_ seed: Double) -> CGFloat {

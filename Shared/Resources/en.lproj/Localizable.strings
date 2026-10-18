@@ -58,7 +58,7 @@
 "paywall.benefit.downloads" = "Offline downloads";
 "paywall.benefit.downloads.detail" = "Save tracks for trains, flights, and rooms with no signal.";
 "paywall.benefit.scenes" = "All night scenes";
-"paywall.benefit.scenes.detail" = "Rain, city lights, aurora, and the shore.";
+"paywall.benefit.scenes.detail" = "Luna Sleep, the rooftop, rain, city lights, aurora, and the shore.";
 "paywall.benefit.stats" = "Focus stats";
 "paywall.benefit.stats.detail" = "Minutes and streaks, kept on this device.";
 "paywall.bestValue" = "Best value";
@@ -86,8 +86,14 @@
 "scene.aurora" = "Aurora";
 "scene.cityWindow" = "City Window";
 "scene.locked" = "Pro scene";
+"scene.lunaRooftop" = "Luna Rooftop";
+"scene.lunaSleep" = "Luna Sleep";
+"scene.lunaStudy" = "Luna Study";
 "scene.moonGarden" = "Moon Garden";
 "scene.rainWindow" = "Rain Window";
+"scene.sleepSuggest" = "Luna can keep watch while you sleep";
+"scene.sleepSuggest.dismiss" = "Dismiss scene suggestion";
+"scene.sleepSuggest.use" = "Show Luna Sleep";
 "scene.starlitShore" = "Starlit Shore";
 "sleep.active" = "Sleep timer on";
 "sleep.cancel" = "Cancel sleep timer";

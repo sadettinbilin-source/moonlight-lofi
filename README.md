@@ -10,9 +10,9 @@ Swift 5.9, SwiftUI, iOS 17 and later.
 - Offline copies in Application Support (`MoonlightTracks`). Downloads are part of Pro.
 - Focus timer with custom focus, short break, and long break lengths. Remaining time is `endDate - now`, so leaving the app does not drift the clock.
 - A local notification when a phase ends, a Live Activity (Lock Screen and Dynamic Island), and a Home Screen widget.
-- Sleep timer that eases the player's volume to silence, then stops. A dark screen hides the UI.
-- Five night scenes drawn in SwiftUI. Moon Garden is free. The other four are Pro.
-- Pro unlocks the full catalog, downloads, every scene, and focus stats. Free keeps the tracks marked `isPro: false` and Moon Garden. The timer itself is free.
+- Sleep timer that eases the player's volume to silence, then stops. A dark screen hides the UI. While it runs, the player suggests the Luna Sleep scene.
+- Eight scenes. Luna Study, Luna Sleep, and Luna Rooftop are illustrations of the mascot. Moon Garden, Rain Window, City Window, Aurora, and Starlit Shore are drawn in SwiftUI. Luna Study is the default. Luna Study and Moon Garden are free. The other six are Pro.
+- Pro unlocks the full catalog, downloads, every scene, and focus stats. Free keeps the tracks marked `isPro: false`, Luna Study, and Moon Garden. The timer itself is free.
 - Focus minutes and the day streak are stored with SwiftData.
 - English and German, following the system language.
 
@@ -31,6 +31,8 @@ MoonlightLofiWidget        Home Screen widget and Live Activity
 | --- | --- |
 | `FocusTimerEngine` | Start, pause, resume, and complete phases from dates. One in-flight interval is settled when the app returns. Missed breaks are not replayed. If auto-continue is on and the app notices the end within 15 seconds, the next phase starts. |
 | `SleepPlan` | Volume from the clock. Full volume until the fade window, then a cosine ease to silence. |
+| `IllustratedMotion` | Aspect-fill crop around Luna. A slow Ken Burns pan on a portrait iPhone. Reduce Motion, and every other size, stays still. |
+| `SleepSceneOffer` | Offers Luna Sleep while a sleep timer is running, until the listener switches or dismisses it. |
 | `EntitlementPolicy` | What Free and Pro may play, download, and open. StoreKit only answers "which product ids are active?" |
 | `CatalogDecoder` | `tracks.json`: safe ids, https URLs, bundled file or remote URL. |
 | `PlaybackController` | `AVPlayer`, Now Playing, remote commands, and the sleep fade while audio is playing. |
@@ -111,6 +113,20 @@ Regenerate the sample tones and icon with:
 python3 scripts/generate_placeholders.py
 ```
 
+## Scenes
+
+Luna Study, Luna Sleep, and Luna Rooftop are landscape paintings in the asset catalog:
+
+| Scene | Image set | Plan |
+| --- | --- | --- |
+| Luna Study | `luna_focus` | Free, and the default |
+| Luna Sleep | `luna_sleep` | Pro. Suggested while a sleep timer is running |
+| Luna Rooftop | `luna_rooftop` | Pro |
+
+On a portrait iPhone the painting aspect-fills around Luna, who sits center-right, and drifts in a slow Ken Burns pan (`IllustratedMotion`, about 46 seconds). Reduce Motion holds the still crop, and so do iPad and landscape layouts. Stars and a little rain from the drawn scenes sit on top at low opacity, with a bottom gradient so the player stays readable. Dismissing the sleep suggestion lasts until that timer ends. Moon Garden stays free so an earlier install does not lose the scene it already had.
+
+Replace a painting by dropping a new landscape JPG into `MoonlightLofi/Resources/Assets.xcassets/<name>.imageset/` and keeping the name in `Contents.json`. If the aspect ratio changes, update `AmbientScene.artworkAspect` so the crop still covers the screen.
+
 ## App Store Connect products
 
 Create these in App Store Connect with the same product ids. Prices are the intended US prices; the app displays whatever StoreKit returns.
@@ -131,7 +147,7 @@ Strings live in `Shared/Resources/en.lproj` and `de.lproj` and are copied into b
 
 ## Tests
 
-Timer, sleep fade, entitlements, catalog decoding, queue order, streaks, and English/German key parity:
+Timer, sleep fade, entitlements, the Luna crop and sleep-scene suggestion, catalog decoding, queue order, streaks, and English/German key parity:
 
 ```bash
 swift test --package-path Packages/MoonlightCore

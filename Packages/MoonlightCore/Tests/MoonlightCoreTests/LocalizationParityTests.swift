@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+@testable import MoonlightCore
 
 final class LocalizationParityTests: XCTestCase {
     func testGermanStringsCoverEnglishKeys() throws {
@@ -16,6 +17,11 @@ final class LocalizationParityTests: XCTestCase {
         let germanDict = try String(contentsOf: root.appendingPathComponent("de.lproj/Localizable.stringsdict"), encoding: .utf8)
         XCTAssertTrue(englishDict.contains("<key>streak.days</key>"))
         XCTAssertTrue(germanDict.contains("<key>streak.days</key>"))
+
+        for scene in AmbientScene.allCases {
+            XCTAssertTrue(englishKeys.contains(scene.titleKey), scene.titleKey)
+            XCTAssertTrue(germanKeys.contains(scene.titleKey), scene.titleKey)
+        }
     }
 
     private func stringKeys(in text: String) -> Set<String> {
