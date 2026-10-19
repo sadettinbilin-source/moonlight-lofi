@@ -20,6 +20,12 @@ jobs:
       - name: Select the latest Xcode
         run: bash scripts/select_xcode.sh
 
+      - name: Validate catalog and bundled audio
+        run: python3 scripts/validate_catalog.py
+
+      - name: Unit tests
+        run: swift test --package-path Packages/MoonlightCore
+
       - name: Install XcodeGen
         run: brew install xcodegen
 

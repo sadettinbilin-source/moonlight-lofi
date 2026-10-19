@@ -1,3 +1,4 @@
+import MoonlightCore
 import SwiftUI
 
 struct SceneBackdrop: View {

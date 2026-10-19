@@ -153,9 +153,7 @@ xcodebuild test \
   -only-testing:MoonlightLofiTests
 ```
 
-GitHub Actions (`.github/workflows/ios.yml`) runs the catalog check, `swift test`, generates the project, and runs the hosted tests on `macos-latest`.
-
-`.github/workflows/ios-ci.yml` is the screenshot run. It uses `macos-15`, selects the newest Xcode, generates the project, and runs unit and UI tests on an available iPhone simulator (an exact iPhone 16 when that device exists). The UI tests keep screenshots of the player, scenes, library, focus timer, sleep timer, and paywall. The paywall reads `Products.storekit` from the scheme test action. Screenshots are uploaded as the `screenshots` artifact, and the result bundle as `xcresult`.
+`.github/workflows/ios-ci.yml` is the CI run. On `macos-15` it selects the newest Xcode, checks the catalog, runs `swift test`, generates the project, and runs unit and UI tests on an available iPhone simulator (an exact iPhone 16 when that device exists). The UI tests keep screenshots of the player, scenes, library, focus timer, sleep timer, and paywall. The paywall reads `Products.storekit` from the scheme test action. Screenshots are uploaded as the `screenshots` artifact, and the result bundle as `xcresult`.
 
 ## Capabilities to confirm in Xcode
 
