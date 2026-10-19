@@ -10,3 +10,5 @@ xcuserdata/
 Packages/MoonlightCore/.build/
 .idea/
 staging/
+__pycache__/
+*.pyc
