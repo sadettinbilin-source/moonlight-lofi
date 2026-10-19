@@ -177,7 +177,7 @@ struct FocusRing: View {
             Circle()
                 .stroke(Color.white.opacity(0.08), lineWidth: 16)
             Circle()
-                .trim(from: 0, to: max(0, min(1, progress)))
+                .trim(from: 0, to: CGFloat(max(0, min(1, progress))))
                 .stroke(Palette.moon, style: StrokeStyle(lineWidth: 16, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             VStack(spacing: 6) {

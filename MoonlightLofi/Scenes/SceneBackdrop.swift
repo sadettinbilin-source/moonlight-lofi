@@ -115,7 +115,7 @@ private func drawRainWindow(_ context: GraphicsContext, _ size: CGSize, _ time: 
         let seed = Double(index)
         let x = unit(seed + 0.4) * size.width
         let length = 12 + unit(seed + 2) * 18
-        let speed = 80 + unit(seed + 3) * 70
+        let speed = 80 + Double(unit(seed + 3)) * 70
         let travel = animated ? time * speed + Double(index) * 47 : Double(index) * 36
         let y = CGFloat(travel.truncatingRemainder(dividingBy: Double(size.height)))
         var line = Path()
@@ -291,7 +291,7 @@ func drawNightParticles(
         let seed = Double(index) + 0.6
         let x = unit(seed + 0.4) * size.width
         let length = 10 + unit(seed + 2) * 14
-        let speed = 70 + unit(seed + 3) * 50
+        let speed = 70 + Double(unit(seed + 3)) * 50
         let travel = animated ? time * speed + Double(index) * 41 : Double(index) * 28
         let y = CGFloat(travel.truncatingRemainder(dividingBy: Double(size.height)))
         var line = Path()

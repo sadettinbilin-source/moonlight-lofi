@@ -54,8 +54,8 @@ private struct AccessMark: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .modifier(AccessID(identifier))
-            .modifier(AccessValue(value))
+            .modifier(AccessID(identifier: identifier))
+            .modifier(AccessValue(value: value))
     }
 }
 

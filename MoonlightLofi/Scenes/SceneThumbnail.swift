@@ -9,8 +9,8 @@ struct SceneThumbnail: View {
             if let name = scene.imageName {
                 let placement = IllustratedMotion.placement(
                     imageAspect: scene.artworkAspect ?? 16.0 / 9.0,
-                    viewWidth: geo.size.width,
-                    viewHeight: geo.size.height,
+                    viewWidth: Double(geo.size.width),
+                    viewHeight: Double(geo.size.height),
                     focal: scene.focalPoint,
                     time: 0,
                     animated: false
@@ -18,8 +18,8 @@ struct SceneThumbnail: View {
                 Image(name)
                     .resizable()
                     .interpolation(.medium)
-                    .frame(width: placement.width, height: placement.height)
-                    .offset(x: placement.originX, y: placement.originY)
+                    .frame(width: CGFloat(placement.width), height: CGFloat(placement.height))
+                    .offset(x: CGFloat(placement.originX), y: CGFloat(placement.originY))
             } else {
                 SceneBackdrop(scene: scene, still: true)
             }

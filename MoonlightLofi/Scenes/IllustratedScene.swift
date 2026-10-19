@@ -22,8 +22,8 @@ struct IllustratedScene: View {
                         Image(name)
                             .resizable()
                             .interpolation(.high)
-                            .frame(width: placement.width, height: placement.height)
-                            .offset(x: placement.originX, y: placement.originY)
+                            .frame(width: CGFloat(placement.width), height: CGFloat(placement.height))
+                            .offset(x: CGFloat(placement.originX), y: CGFloat(placement.originY))
                     }
                     Canvas { context, size in
                         let rain = scene == .lunaRooftop ? 16 : 8
@@ -60,8 +60,8 @@ struct IllustratedScene: View {
     private func placement(in size: CGSize, date: Date) -> ImagePlacement {
         IllustratedMotion.placement(
             imageAspect: scene.artworkAspect ?? 16.0 / 9.0,
-            viewWidth: size.width,
-            viewHeight: size.height,
+            viewWidth: Double(size.width),
+            viewHeight: Double(size.height),
             focal: scene.focalPoint,
             time: date.timeIntervalSinceReferenceDate,
             animated: portraitPhone && !reduceMotion
