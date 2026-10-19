@@ -55,15 +55,17 @@ targets:
       - path: Shared
         excludes:
           - Resources/**
-    resources:
+      # XcodeGen only copies files listed under sources. A resources: key is ignored.
+      # .lproj directories inside a group become variant groups (NSLocalizedString).
+      # Audio is a folder reference so playback can find files in Audio/.
+      # Assets.xcassets stays a file reference so actool compiles the catalog.
+      - path: Shared/Resources
+        type: group
       - path: MoonlightLofi/Resources/Catalog/tracks.json
       - path: MoonlightLofi/Resources/Audio
         type: folder
       - path: MoonlightLofi/Resources/Assets.xcassets
-      - path: Shared/Resources/en.lproj
-        type: folder
-      - path: Shared/Resources/de.lproj
-        type: folder
+        type: file
       - path: MoonlightLofi/PrivacyInfo.xcprivacy
     dependencies:
       - package: MoonlightCore
@@ -90,11 +92,8 @@ targets:
       - path: Shared
         excludes:
           - Resources/**
-    resources:
-      - path: Shared/Resources/en.lproj
-        type: folder
-      - path: Shared/Resources/de.lproj
-        type: folder
+      - path: Shared/Resources
+        type: group
       - path: MoonlightLofiWidget/PrivacyInfo.xcprivacy
     dependencies:
       - package: MoonlightCore
@@ -111,6 +110,7 @@ targets:
     platform: iOS
     sources:
       - path: Packages/MoonlightCore/Tests/MoonlightCoreTests
+      - path: MoonlightLofiTests
     dependencies:
       - target: MoonlightLofi
       - package: MoonlightCore

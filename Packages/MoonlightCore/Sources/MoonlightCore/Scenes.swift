@@ -83,3 +83,16 @@ public enum SleepSceneOffer {
         sleepTimerActive && selected != scene && !dismissed
     }
 }
+
+/// Scene-chip titles. Split only on whitespace so a long word scales instead of breaking mid-word.
+public enum SceneTitleLayout {
+    public static func lines(for title: String) -> [String] {
+        let words = title.split(whereSeparator: { $0.isWhitespace }).map(String.init)
+        guard words.count > 1 else { return [title] }
+        let midpoint = (words.count + 1) / 2
+        return [
+            words[..<midpoint].joined(separator: " "),
+            words[midpoint...].joined(separator: " ")
+        ]
+    }
+}

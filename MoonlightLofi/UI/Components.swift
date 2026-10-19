@@ -21,7 +21,7 @@ struct PrimaryButton: View {
             .foregroundStyle(Palette.ink)
         }
         .buttonStyle(.plain)
-        .modifier(AccessMark(identifier: identifier, value: nil))
+        .accessibilityIdentifier(identifier ?? "")
     }
 }
 
@@ -44,44 +44,8 @@ struct IconCircle: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(LocalizedStringKey(labelKey)))
-        .modifier(AccessMark(identifier: identifier, value: value))
-    }
-}
-
-private struct AccessMark: ViewModifier {
-    var identifier: String?
-    var value: String?
-
-    func body(content: Content) -> some View {
-        content
-            .modifier(AccessID(identifier: identifier))
-            .modifier(AccessValue(value: value))
-    }
-}
-
-private struct AccessID: ViewModifier {
-    var identifier: String?
-
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if let identifier {
-            content.accessibilityIdentifier(identifier)
-        } else {
-            content
-        }
-    }
-}
-
-private struct AccessValue: ViewModifier {
-    var value: String?
-
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if let value {
-            content.accessibilityValue(Text(value))
-        } else {
-            content
-        }
+        .accessibilityIdentifier(identifier ?? "")
+        .accessibilityValue(Text(value ?? ""))
     }
 }
 

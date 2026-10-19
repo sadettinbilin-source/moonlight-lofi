@@ -67,7 +67,7 @@ final class MoonlightScreenshots: XCTestCase {
 
     func testPaywallLoadsStoreKitPlans() throws {
         try openTab("tab.you", label: "You")
-        let upgrade = requireButton("you.upgrade", label: "See Pro plans")
+        let upgrade = requireButton("you.upgrade.plans", label: "See Pro plans")
         tap(upgrade)
         XCTAssertTrue(wait(any("screen.paywall"), timeout: 20))
         let yearly = app.staticTexts["Yearly"]

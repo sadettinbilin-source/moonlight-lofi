@@ -132,18 +132,18 @@ Local testing uses `MoonlightLofi/Resources/Products.storekit`, already selected
 
 ## Localization
 
-Strings live in `Shared/Resources/en.lproj` and `de.lproj` and are copied into both the app and the widget as folder references, which is what `NSLocalizedString` looks up. The system language picks the table. If a screen shows raw keys such as `tab.listen`, confirm both `.lproj` folders are in Copy Bundle Resources. Add a language by copying `en.lproj`, translating, and listing the code in `project.yml` (`knownRegions`) and `CFBundleLocalizations`.
+Strings live in `Shared/Resources/en.lproj` and `de.lproj`. List that folder under each target's `sources` in `project.yml`. XcodeGen has no `resources` key — an unknown key is ignored, and the strings, `tracks.json`, `Audio`, and `Assets.xcassets` never reach the app. As a group (not a folder reference), the `.lproj` directories become variant groups, which is what `NSLocalizedString` looks up. The system language picks the table. If a screen shows raw keys such as `tab.listen`, the variant group is missing from that target's Copy Bundle Resources. Add a language by copying `en.lproj`, translating, and listing the code in `project.yml` (`knownRegions`) and `CFBundleLocalizations`.
 
 ## Tests
 
-Timer, sleep fade, entitlements, the Luna crop and sleep-scene suggestion, catalog decoding, queue order, streaks, and English/German key parity:
+Timer, sleep fade, entitlements, the Luna crop and sleep-scene suggestion, scene-title line breaks, catalog decoding, queue order, streaks, and English/German key parity:
 
 ```bash
 swift test --package-path Packages/MoonlightCore
 python3 scripts/validate_catalog.py
 ```
 
-After `xcodegen generate`, the same tests also run as the `MoonlightLofiTests` bundle:
+After `xcodegen generate`, those tests also run as the `MoonlightLofiTests` bundle, plus `BundleResourceTests`, which checks that the hosted app bundle contains 11 tracks, each audio file, a translated `library.header`, and the Luna scene images:
 
 ```bash
 xcodebuild test \

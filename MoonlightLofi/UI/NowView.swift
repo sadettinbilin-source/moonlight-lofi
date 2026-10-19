@@ -125,20 +125,32 @@ struct NowView: View {
                             .padding(5)
                     }
                 }
-                Text(LocalizedStringKey(scene.titleKey))
-                    .font(.system(size: 11, weight: selected ? .semibold : .regular, design: .rounded))
-                    .foregroundStyle(selected ? Palette.moon : Palette.text)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-                    .frame(width: 76)
+                sceneTitle(L10n.tr(scene.titleKey), selected: selected)
             }
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("scene.\(scene.rawValue)")
-        .accessibilityLabel(Text(LocalizedStringKey(scene.titleKey)))
+        .accessibilityLabel(Text(verbatim: L10n.tr(scene.titleKey)))
         .accessibilityHint(Text(locked ? "scene.locked" : ""))
         .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    /// Breaks only on spaces. A single word scales down instead of splitting mid-word.
+    private func sceneTitle(_ title: String, selected: Bool) -> some View {
+        let lines = SceneTitleLayout.lines(for: title)
+        return VStack(spacing: 0) {
+            ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                Text(verbatim: line)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.45)
+                    .allowsTightening(true)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+        }
+        .font(.system(size: 11, weight: selected ? .semibold : .regular, design: .rounded))
+        .foregroundStyle(selected ? Palette.moon : Palette.text)
+        .frame(width: 88)
+        .accessibilityHidden(true)
     }
 
     private var trackBlock: some View {

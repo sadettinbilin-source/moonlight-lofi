@@ -99,10 +99,13 @@ struct YouView: View {
                 Text("stats.locked")
                     .font(.system(.subheadline, design: .rounded))
                     .foregroundStyle(Palette.muted)
-                Button("you.upgrade") {
+                Button {
                     model.showPaywall = true
+                } label: {
+                    Text("you.upgrade")
                 }
-                .accessibilityIdentifier("you.upgrade")
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("you.upgrade.stats")
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .foregroundStyle(Palette.ink)
                 .padding(.horizontal, 16)
@@ -119,10 +122,15 @@ struct YouView: View {
                     .font(.system(.headline, design: .rounded))
                     .foregroundStyle(Palette.text)
                 if !model.isPro {
-                    Button("you.upgrade") { model.showPaywall = true }
-                        .accessibilityIdentifier("you.upgrade")
-                        .font(.system(.body, design: .rounded))
-                        .foregroundStyle(Palette.moon)
+                    Button {
+                        model.showPaywall = true
+                    } label: {
+                        Text("you.upgrade")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("you.upgrade.plans")
+                    .font(.system(.body, design: .rounded))
+                    .foregroundStyle(Palette.moon)
                 } else {
                     Link("you.manage", destination: Links.subscriptions)
                         .font(.system(.body, design: .rounded))

@@ -85,6 +85,19 @@ final class IllustratedMotionTests: XCTestCase {
         }
     }
 
+    func testSceneTitlesBreakOnSpacesOnly() {
+        XCTAssertEqual(SceneTitleLayout.lines(for: "Sternenufer"), ["Sternenufer"])
+        XCTAssertEqual(SceneTitleLayout.lines(for: "scene.lunaStudy"), ["scene.lunaStudy"])
+        XCTAssertEqual(SceneTitleLayout.lines(for: "Luna Study"), ["Luna", "Study"])
+        XCTAssertEqual(SceneTitleLayout.lines(for: "Starlit Shore"), ["Starlit", "Shore"])
+        XCTAssertEqual(SceneTitleLayout.lines(for: "Luna auf dem Dach"), ["Luna auf", "dem Dach"])
+        for line in SceneTitleLayout.lines(for: "Luna auf dem Dach") {
+            XCTAssertFalse(line.contains("\n"))
+            XCTAssertFalse(line.hasPrefix(" "))
+            XCTAssertFalse(line.hasSuffix(" "))
+        }
+    }
+
     private func place(time: TimeInterval, animated: Bool) -> ImagePlacement {
         IllustratedMotion.placement(
             imageAspect: AmbientScene.lunaRooftop.artworkAspect!,

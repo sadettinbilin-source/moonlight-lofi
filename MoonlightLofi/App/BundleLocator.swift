@@ -1,20 +1,33 @@
 import Foundation
 
 enum BundleLocator {
-    static func catalogData() -> Data? {
-        guard let url = Bundle.main.url(forResource: "tracks", withExtension: "json") else {
-            return nil
-        }
+    static func catalogData(in bundle: Bundle = .main) -> Data? {
+        guard let url = catalogURL(in: bundle) else { return nil }
         return try? Data(contentsOf: url)
     }
 
-    static func audioURL(named file: String) -> URL? {
+    static func catalogURL(in bundle: Bundle = .main) -> URL? {
+        let subdirectories: [String?] = [nil, "Catalog", "Resources/Catalog"]
+        for subdirectory in subdirectories {
+            if let url = bundle.url(forResource: "tracks", withExtension: "json", subdirectory: subdirectory) {
+                return url
+            }
+        }
+        return nil
+    }
+
+    static func audioURL(named file: String, in bundle: Bundle = .main) -> URL? {
         let ns = file as NSString
         let base = ns.deletingPathExtension
         let ext = ns.pathExtension
         let fileExtension = ext.isEmpty ? nil : ext
-        return Bundle.main.url(forResource: base, withExtension: fileExtension, subdirectory: "Audio")
-            ?? Bundle.main.url(forResource: base, withExtension: fileExtension)
+        let subdirectories: [String?] = ["Audio", nil, "Resources/Audio"]
+        for subdirectory in subdirectories {
+            if let url = bundle.url(forResource: base, withExtension: fileExtension, subdirectory: subdirectory) {
+                return url
+            }
+        }
+        return nil
     }
 }
 
