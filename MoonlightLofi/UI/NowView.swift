@@ -1,9 +1,21 @@
 import MoonlightCore
 import SwiftUI
 
+private struct MoonGapKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        let next = nextValue()
+        if next.width > 1, next.height > 1 {
+            value = next
+        }
+    }
+}
+
 struct NowView: View {
     @Environment(AppModel.self) private var model
     var now: Date
+    @State private var moonGap: CGRect = .zero
 
     var body: some View {
         ZStack {
@@ -12,14 +24,14 @@ struct NowView: View {
                 if model.activeScene.isIllustrated {
                     IllustratedScene(scene: model.activeScene)
                 } else {
-                    SceneBackdrop(scene: model.activeScene)
+                    SceneBackdrop(scene: model.activeScene, moonGap: moonGap)
                 }
             }
             .id(model.activeScene.rawValue)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea()
             .allowsHitTesting(false)
-            .zIndex(0)
+            .compositingGroup()
             LinearGradient(
                 colors: [.clear, .black.opacity(0.15), .black.opacity(0.72)],
                 startPoint: .top,
@@ -27,13 +39,20 @@ struct NowView: View {
             )
             .ignoresSafeArea()
             .allowsHitTesting(false)
-            .zIndex(1)
+        }
+        .overlay {
             HStack {
                 Spacer(minLength: 0)
                 VStack(spacing: 22) {
                     header
                     scenePicker
                     Spacer(minLength: 12)
+                        .frame(maxWidth: .infinity)
+                        .background {
+                            GeometryReader { proxy in
+                                Color.clear.preference(key: MoonGapKey.self, value: proxy.frame(in: .global))
+                            }
+                        }
                     trackBlock
                     transport
                     secondary
@@ -43,8 +62,8 @@ struct NowView: View {
                 .frame(maxWidth: 560)
                 Spacer(minLength: 0)
             }
-            .zIndex(2)
         }
+        .onPreferenceChange(MoonGapKey.self) { moonGap = $0 }
     }
 
     private var header: some View {

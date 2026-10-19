@@ -1,12 +1,13 @@
 import MoonlightCore
 import SwiftUI
-import UIKit
 
 struct SceneBackdrop: View {
     var scene: AmbientScene
     var still: Bool = false
+    /// Empty band between the scene picker and the track title, in global coordinates.
+    var moonGap: CGRect = .zero
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var topInset: CGFloat = 59
+    @State private var canvasFrame: CGRect = .zero
 
     private var paused: Bool { still || reduceMotion }
 
@@ -19,37 +20,30 @@ struct SceneBackdrop: View {
                     size: size,
                     date: timeline.date,
                     animated: !paused,
-                    topInset: still ? 0 : topInset
+                    moonGap: still ? .zero : localMoonGap(canvas: size)
                 )
             }
         }
         .modifier(BleedToEdges(enabled: !still))
         .background {
             if !still {
-                WindowSafeTop(top: $topInset)
+                GeometryReader { proxy in
+                    Color.clear
+                        .onAppear { canvasFrame = proxy.frame(in: .global) }
+                        .onChange(of: proxy.frame(in: .global)) { _, frame in
+                            canvasFrame = frame
+                        }
+                }
             }
         }
         .accessibilityHidden(true)
     }
-}
 
-private struct WindowSafeTop: UIViewRepresentable {
-    @Binding var top: CGFloat
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.isUserInteractionEnabled = false
-        view.backgroundColor = .clear
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        DispatchQueue.main.async {
-            let inset = uiView.window?.safeAreaInsets.top ?? 0
-            if inset > 1, inset != top {
-                top = inset
-            }
+    private func localMoonGap(canvas: CGSize) -> CGRect {
+        guard canvasFrame.width > 1, moonGap.width > 1, moonGap.height > 1 else {
+            return .zero
         }
+        return moonGap.offsetBy(dx: -canvasFrame.minX, dy: -canvasFrame.minY)
     }
 }
 
@@ -72,14 +66,14 @@ private func draw(
     size: CGSize,
     date: Date,
     animated: Bool,
-    topInset: CGFloat
+    moonGap: CGRect
 ) {
     let time = animated ? date.timeIntervalSinceReferenceDate : 0
     switch scene {
     case .lunaStudy, .lunaSleep, .lunaRooftop:
         fillGradient(context, size, top: rgb(0.07, 0.07, 0.14), bottom: rgb(0.03, 0.04, 0.08))
     case .moonGarden:
-        drawMoonGarden(context, size, time, topInset: topInset)
+        drawMoonGarden(context, size, time, moonGap: moonGap)
     case .rainWindow:
         drawRainWindow(context, size, time, animated: animated)
     case .cityWindow:
@@ -91,16 +85,21 @@ private func draw(
     }
 }
 
-private func drawMoonGarden(_ context: GraphicsContext, _ size: CGSize, _ time: TimeInterval, topInset: CGFloat) {
+private func drawMoonGarden(_ context: GraphicsContext, _ size: CGSize, _ time: TimeInterval, moonGap: CGRect) {
     fillGradient(context, size, top: rgb(0.10, 0.08, 0.22), bottom: rgb(0.03, 0.04, 0.09))
-    let fullScreen = size.height > 500
-    let radius = fullScreen ? min(size.width * 0.042, 16) : min(size.width, size.height) * 0.16
-    let glow = radius * 1.45
-    let bar = fullScreen ? (topInset > 1 ? topInset : 59) : 0
-    let center = CGPoint(
-        x: fullScreen ? size.width * 0.30 : size.width * 0.62,
-        y: bar + glow + (fullScreen ? 12 : radius)
+    let placed = MoonGardenLayout.disc(
+        canvasWidth: Double(size.width),
+        canvasHeight: Double(size.height),
+        gap: MoonGap(
+            x: Double(moonGap.minX),
+            y: Double(moonGap.minY),
+            width: Double(moonGap.width),
+            height: Double(moonGap.height)
+        )
     )
+    let center = CGPoint(x: placed.centerX, y: placed.centerY)
+    let radius = CGFloat(placed.radius)
+    let glow = CGFloat(placed.glow)
     fillGlow(context, center: center, radius: glow, color: Color.white.opacity(0.28))
     fillCircle(context, center: center, radius: radius, color: rgb(0.95, 0.93, 1))
     fillCircle(
