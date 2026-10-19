@@ -128,7 +128,7 @@ Create these in App Store Connect with the same product ids. Prices are the inte
 
 Put the monthly and yearly products in one subscription group named **Moonlight Pro**. Yearly is the highlighted plan in the paywall.
 
-Local testing uses `MoonlightLofi/Resources/Products.storekit`, already selected on the `MoonlightLofi` scheme. In the simulator you can buy from the paywall without an Apple ID. Restore calls `AppStore.sync()`. Terms and privacy open placeholder pages (`https://moonlightlofi.app/terms` and `https://moonlightlofi.app/privacy`); replace those URLs in `Links` before release.
+Local testing uses `MoonlightLofi/Resources/Products.storekit`. `project.yml` sets that path on the scheme Run and Test actions. XcodeGen only writes it onto the Run action, so after `xcodegen generate` run `python3 scripts/patch_storekit_scheme.py`. That keeps the relative path `../../MoonlightLofi/Resources/Products.storekit` on both actions (resolved from `xcshareddata`). CI does this before `xcodebuild`. In the simulator you can buy from the paywall without an Apple ID. UI tests also pass `-UITestDemoPlans`, which shows Monthly $2.99, Yearly $19.99, and Lifetime $29.99 when StoreKit has not returned products yet. Restore calls `AppStore.sync()`. Terms and privacy open placeholder pages (`https://moonlightlofi.app/terms` and `https://moonlightlofi.app/privacy`); replace those URLs in `Links` before release.
 
 ## Localization
 

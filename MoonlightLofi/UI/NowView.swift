@@ -7,17 +7,27 @@ struct NowView: View {
 
     var body: some View {
         ZStack {
-            if model.activeScene.isIllustrated {
-                IllustratedScene(scene: model.activeScene)
-            } else {
-                SceneBackdrop(scene: model.activeScene)
+            Palette.night
+            Group {
+                if model.activeScene.isIllustrated {
+                    IllustratedScene(scene: model.activeScene)
+                } else {
+                    SceneBackdrop(scene: model.activeScene)
+                }
             }
+            .id(model.activeScene.rawValue)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+            .zIndex(0)
             LinearGradient(
                 colors: [.clear, .black.opacity(0.15), .black.opacity(0.72)],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
+            .allowsHitTesting(false)
+            .zIndex(1)
             HStack {
                 Spacer(minLength: 0)
                 VStack(spacing: 22) {
@@ -33,6 +43,7 @@ struct NowView: View {
                 .frame(maxWidth: 560)
                 Spacer(minLength: 0)
             }
+            .zIndex(2)
         }
     }
 
@@ -60,7 +71,8 @@ struct NowView: View {
                         sceneChip(scene)
                     }
                 }
-                .padding(.horizontal, 2)
+                .padding(.leading, 2)
+                .padding(.trailing, 28)
                 .padding(.vertical, 2)
             }
             .accessibilityIdentifier("scene.picker")
@@ -149,7 +161,10 @@ struct NowView: View {
         }
         .font(.system(size: 11, weight: selected ? .semibold : .regular, design: .rounded))
         .foregroundStyle(selected ? Palette.moon : Palette.text)
-        .frame(width: 88)
+        .padding(.horizontal, 2)
+        .padding(.vertical, 1)
+        .frame(width: 76)
+        .background(Color.black.opacity(0.42), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         .accessibilityHidden(true)
     }
 

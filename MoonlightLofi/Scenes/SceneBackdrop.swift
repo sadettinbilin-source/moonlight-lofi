@@ -58,9 +58,9 @@ private func draw(
 
 private func drawMoonGarden(_ context: GraphicsContext, _ size: CGSize, _ time: TimeInterval) {
     fillGradient(context, size, top: rgb(0.10, 0.08, 0.22), bottom: rgb(0.03, 0.04, 0.09))
-    let center = CGPoint(x: size.width * 0.72, y: size.height * 0.24)
-    let radius = min(size.width, size.height) * 0.11
-    fillGlow(context, center: center, radius: radius * 2.6, color: Color.white.opacity(0.28))
+    let center = CGPoint(x: size.width * 0.86, y: size.height * 0.06)
+    let radius = min(size.width, size.height) * 0.07
+    fillGlow(context, center: center, radius: radius * 1.6, color: Color.white.opacity(0.28))
     fillCircle(context, center: center, radius: radius, color: rgb(0.95, 0.93, 1))
     fillCircle(
         context,

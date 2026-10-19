@@ -30,7 +30,9 @@ jobs:
         run: brew install xcodegen
 
       - name: Generate the Xcode project
-        run: xcodegen generate
+        run: |
+          xcodegen generate
+          python3 scripts/patch_storekit_scheme.py
 
       - name: Build and test
         run: bash scripts/ios_ci_xcodebuild.sh

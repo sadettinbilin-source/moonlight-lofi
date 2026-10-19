@@ -36,6 +36,8 @@ schemes:
       storeKitConfiguration: MoonlightLofi/Resources/Products.storekit
     test:
       config: Debug
+      # XcodeGen writes this onto LaunchAction only. scripts/patch_storekit_scheme.py
+      # copies the same relative path onto TestAction after generate.
       storeKitConfiguration: MoonlightLofi/Resources/Products.storekit
       targets:
         - MoonlightLofiTests

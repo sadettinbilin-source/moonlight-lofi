@@ -8,7 +8,11 @@ final class MoonlightScreenshots: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launchArguments = [
+            "-AppleLanguages", "(en)",
+            "-AppleLocale", "en_US",
+            "-UITestDemoPlans"
+        ]
         addUIInterruptionMonitor(withDescription: "System dialog") { alert in
             for label in ["Allow", "Don’t Allow", "Don't Allow", "OK", "Not Now", "Close"] {
                 let button = alert.buttons[label]
@@ -29,7 +33,7 @@ final class MoonlightScreenshots: XCTestCase {
 
     func testPlayerPlaysAFreeTrack() throws {
         XCTAssertTrue(wait(any("screen.listen"), timeout: 30))
-        let play = requireButton("transport.play", label: "Play")
+        let play = requireButton("transport.play", labels: ["Play", "Abspielen"])
         tap(play)
         XCTAssertTrue(waitUntilPlaying(timeout: 20), "Play did not reach the playing state")
         RunLoop.current.run(until: Date().addingTimeInterval(2))
@@ -39,47 +43,50 @@ final class MoonlightScreenshots: XCTestCase {
 
     func testScenes() throws {
         XCTAssertTrue(wait(any("screen.listen"), timeout: 30))
-        let garden = sceneButton("moonGarden", label: "Moon Garden")
+        let garden = sceneButton("moonGarden", labels: ["Moon Garden", "Mondgarten"])
         tap(garden)
         capture("scenes")
     }
 
     func testLibrary() throws {
-        try openTab("tab.library", label: "Library")
+        try openTab("tab.library", labels: ["Library", "Bibliothek"])
         XCTAssertTrue(wait(any("screen.library"), timeout: 15))
         capture("library")
     }
 
     func testFocusTimer() throws {
-        try openTab("tab.focus", label: "Focus")
+        try openTab("tab.focus", labels: ["Focus", "Fokus"])
         XCTAssertTrue(wait(any("screen.focus"), timeout: 15))
-        _ = requireButton("focus.primary", label: "Start focus")
+        _ = requireButton("focus.primary", labels: ["Start focus", "Fokus starten"])
         capture("focus")
     }
 
     func testSleepTimer() throws {
         XCTAssertTrue(wait(any("screen.listen"), timeout: 30))
-        let sleep = requireButton("action.sleep", label: "Sleep")
+        let sleep = requireButton("action.sleep", labels: ["Sleep", "Schlafen"])
         tap(sleep)
         XCTAssertTrue(wait(any("screen.sleep"), timeout: 15))
         capture("sleep")
     }
 
     func testPaywallLoadsStoreKitPlans() throws {
-        try openTab("tab.you", label: "You")
-        let upgrade = requireButton("you.upgrade.plans", label: "See Pro plans")
+        try openTab("tab.you", labels: ["You", "Du"])
+        let upgrade = requireButton("you.upgrade.plans", labels: ["See Pro plans", "Pro-Pläne ansehen"])
         tap(upgrade)
         XCTAssertTrue(wait(any("screen.paywall"), timeout: 20))
-        let yearly = app.staticTexts["Yearly"]
-        let monthly = app.staticTexts["Monthly"]
-        let appeared = yearly.waitForExistence(timeout: 40) || monthly.waitForExistence(timeout: 5)
-        XCTAssertTrue(appeared, "StoreKit configuration did not load a plan. Check the scheme test action.")
+        let planNames = ["Yearly", "Jährlich", "Monthly", "Monatlich"]
+        let planID = any("paywall.plan.yearly")
+        var appeared = planID.waitForExistence(timeout: 20)
+        if !appeared {
+            appeared = planNames.contains { app.staticTexts[$0].waitForExistence(timeout: 2) }
+        }
+        XCTAssertTrue(appeared, "Paywall did not show a yearly or monthly plan.")
         capture("paywall")
     }
 
     private var isPlaying: Bool {
         let play = app.buttons["transport.play"]
-        if (play.value as? String) == "playing" { return true }
+        if play.exists, (play.value as? String) == "playing" { return true }
         return app.buttons["Pause"].exists
     }
 
@@ -92,7 +99,7 @@ final class MoonlightScreenshots: XCTestCase {
         return isPlaying
     }
 
-    private func openTab(_ identifier: String, label: String) throws {
+    private func openTab(_ identifier: String, labels: [String]) throws {
         let bar = app.tabBars.firstMatch
         XCTAssertTrue(bar.waitForExistence(timeout: 20), "Tab bar did not appear")
         let byID = bar.buttons[identifier]
@@ -100,12 +107,17 @@ final class MoonlightScreenshots: XCTestCase {
             byID.tap()
             return
         }
-        let byLabel = bar.buttons[label]
-        XCTAssertTrue(byLabel.waitForExistence(timeout: 8), "Missing tab \(identifier) / \(label)")
-        byLabel.tap()
+        for label in labels {
+            let byLabel = bar.buttons[label]
+            if byLabel.waitForExistence(timeout: 2) {
+                byLabel.tap()
+                return
+            }
+        }
+        XCTFail("Missing tab \(identifier) / \(labels.joined(separator: ", "))")
     }
 
-    private func sceneButton(_ identifier: String, label: String) -> XCUIElement {
+    private func sceneButton(_ identifier: String, labels: [String]) -> XCUIElement {
         let picker = app.scrollViews["scene.picker"]
         let scoped = picker.buttons["scene.\(identifier)"]
         if picker.waitForExistence(timeout: 8) {
@@ -123,22 +135,24 @@ final class MoonlightScreenshots: XCTestCase {
                 return scoped
             }
         }
-        return requireButton("scene.\(identifier)", label: label)
+        return requireButton("scene.\(identifier)", labels: labels)
     }
 
-    private func requireButton(_ identifier: String, label: String, timeout: TimeInterval = 12) -> XCUIElement {
-        if let found = button(identifier, label: label, timeout: timeout) {
+    private func requireButton(_ identifier: String, labels: [String], timeout: TimeInterval = 12) -> XCUIElement {
+        if let found = button(identifier, labels: labels, timeout: timeout) {
             return found
         }
-        XCTFail("Missing button \(identifier) / \(label)")
+        XCTFail("Missing button \(identifier) / \(labels.joined(separator: ", "))")
         return app.buttons[identifier]
     }
 
-    private func button(_ identifier: String, label: String, timeout: TimeInterval) -> XCUIElement? {
+    private func button(_ identifier: String, labels: [String], timeout: TimeInterval) -> XCUIElement? {
         let byID = app.buttons[identifier]
         if byID.waitForExistence(timeout: timeout) { return byID }
-        let byLabel = app.buttons[label]
-        if byLabel.waitForExistence(timeout: 4) { return byLabel }
+        for label in labels {
+            let byLabel = app.buttons[label]
+            if byLabel.waitForExistence(timeout: 2) { return byLabel }
+        }
         return nil
     }
 

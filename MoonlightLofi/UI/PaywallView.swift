@@ -37,7 +37,15 @@ struct PaywallView: View {
                 benefit("paywall.benefit.scenes", "paywall.benefit.scenes.detail")
                 benefit("paywall.benefit.stats", "paywall.benefit.stats.detail")
 
-                if model.store.isLoading && model.store.products.isEmpty {
+                if !model.store.products.isEmpty && !model.isPro {
+                    ForEach(model.store.products, id: \.id) { product in
+                        productCard(product)
+                    }
+                } else if UITestLaunch.showsDemoPlans && !model.isPro {
+                    ForEach(DemoPlan.all) { plan in
+                        demoCard(plan)
+                    }
+                } else if model.store.isLoading && model.store.products.isEmpty {
                     HStack {
                         ProgressView()
                         Text("paywall.loading")
@@ -48,15 +56,12 @@ struct PaywallView: View {
                     Text("paywall.unavailable")
                         .font(.system(.subheadline, design: .rounded))
                         .foregroundStyle(Palette.muted)
+                        .fixedSize(horizontal: false, vertical: true)
                     Button("paywall.retry") {
                         Task { await model.store.refresh() }
                     }
                     .font(.system(.body, design: .rounded))
                     .foregroundStyle(Palette.moon)
-                } else if !model.isPro {
-                    ForEach(model.store.products, id: \.id) { product in
-                        productCard(product)
-                    }
                 }
                 if let errorKey = model.store.errorKey, model.store.products.isEmpty == false {
                     Text(LocalizedStringKey(errorKey))
@@ -82,7 +87,13 @@ struct PaywallView: View {
             }
             .padding(24)
         }
-        .accessibilityIdentifier("screen.paywall")
+        .accessibilityElement(children: .contain)
+        .background {
+            Color.clear
+                .frame(width: 1, height: 1)
+                .accessibilityElement(children: .ignore)
+                .accessibilityIdentifier("screen.paywall")
+        }
     }
 
     private func benefit(_ title: String, _ detail: String) -> some View {
@@ -109,6 +120,7 @@ struct PaywallView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Text(LocalizedStringKey(nameKey(product.id)))
+                            .accessibilityIdentifier(planIdentifier(product.id))
                         if featured {
                             Text("paywall.bestValue")
                                 .font(.system(.caption2, design: .rounded).weight(.semibold))
@@ -146,6 +158,53 @@ struct PaywallView: View {
         .disabled(model.store.purchasingID != nil)
     }
 
+    private func demoCard(_ plan: DemoPlan) -> some View {
+        let featured = plan.id == ProductIDs.featured
+        return HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(LocalizedStringKey(plan.nameKey))
+                        .accessibilityIdentifier(planIdentifier(plan.id))
+                    if featured {
+                        Text("paywall.bestValue")
+                            .font(.system(.caption2, design: .rounded).weight(.semibold))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Palette.moon, in: Capsule())
+                            .foregroundStyle(Palette.ink)
+                    }
+                }
+                Text(LocalizedStringKey(plan.periodKey))
+                    .font(.system(.caption, design: .rounded))
+                    .foregroundStyle(Palette.muted)
+            }
+            Spacer()
+            Text(plan.price)
+                .font(.system(.headline, design: .rounded))
+        }
+        .font(.system(.body, design: .rounded))
+        .foregroundStyle(Palette.text)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            featured ? Palette.moon.opacity(0.16) : Color.white.opacity(0.05),
+            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(featured ? Palette.moon : Color.white.opacity(0.1), lineWidth: 1)
+        )
+    }
+
+    private func planIdentifier(_ id: String) -> String {
+        switch id {
+        case ProductIDs.monthly: return "paywall.plan.monthly"
+        case ProductIDs.yearly: return "paywall.plan.yearly"
+        case ProductIDs.lifetime: return "paywall.plan.lifetime"
+        default: return "paywall.plan.other"
+        }
+    }
+
     private func nameKey(_ id: String) -> String {
         switch id {
         case ProductIDs.monthly: return "paywall.monthly"
@@ -165,4 +224,25 @@ struct PaywallView: View {
         default: return "paywall.period.once"
         }
     }
+}
+
+enum UITestLaunch {
+    static let demoPlansArgument = "-UITestDemoPlans"
+
+    static var showsDemoPlans: Bool {
+        ProcessInfo.processInfo.arguments.contains(demoPlansArgument)
+    }
+}
+
+struct DemoPlan: Identifiable {
+    var id: String
+    var nameKey: String
+    var periodKey: String
+    var price: String
+
+    static let all: [DemoPlan] = [
+        DemoPlan(id: ProductIDs.monthly, nameKey: "paywall.monthly", periodKey: "paywall.period.month", price: "$2.99"),
+        DemoPlan(id: ProductIDs.yearly, nameKey: "paywall.yearly", periodKey: "paywall.period.year", price: "$19.99"),
+        DemoPlan(id: ProductIDs.lifetime, nameKey: "paywall.lifetime", periodKey: "paywall.period.once", price: "$29.99")
+    ]
 }

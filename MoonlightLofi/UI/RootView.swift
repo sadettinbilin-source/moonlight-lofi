@@ -11,25 +11,29 @@ struct RootView: View {
         TimelineView(.periodic(from: .now, by: 1)) { timeline in
             TabView {
                 NowView(now: timeline.date)
-                    .accessibilityIdentifier("screen.listen")
+                    .accessibilityElement(children: .contain)
+                    .background { screenMarker("screen.listen") }
                     .tabItem {
                         Label("tab.listen", systemImage: "moon.stars")
                             .accessibilityIdentifier("tab.listen")
                     }
                 LibraryView()
-                    .accessibilityIdentifier("screen.library")
+                    .accessibilityElement(children: .contain)
+                    .background { screenMarker("screen.library") }
                     .tabItem {
                         Label("tab.library", systemImage: "music.note.list")
                             .accessibilityIdentifier("tab.library")
                     }
                 FocusView(now: timeline.date)
-                    .accessibilityIdentifier("screen.focus")
+                    .accessibilityElement(children: .contain)
+                    .background { screenMarker("screen.focus") }
                     .tabItem {
                         Label("tab.focus", systemImage: "timer")
                             .accessibilityIdentifier("tab.focus")
                     }
                 YouView()
-                    .accessibilityIdentifier("screen.you")
+                    .accessibilityElement(children: .contain)
+                    .background { screenMarker("screen.you") }
                     .tabItem {
                         Label("tab.you", systemImage: "person")
                             .accessibilityIdentifier("tab.you")
@@ -75,6 +79,13 @@ struct RootView: View {
             model.focus.persist()
         }
     }
+}
+
+private func screenMarker(_ identifier: String) -> some View {
+    Color.clear
+        .frame(width: 1, height: 1)
+        .accessibilityElement(children: .ignore)
+        .accessibilityIdentifier(identifier)
 }
 
 private struct Tick: View {

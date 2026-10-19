@@ -25,7 +25,9 @@ struct SceneThumbnail: View {
             }
         }
         .frame(width: 72, height: 92)
+        .compositingGroup()
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipped()
         .accessibilityHidden(true)
     }
 }
