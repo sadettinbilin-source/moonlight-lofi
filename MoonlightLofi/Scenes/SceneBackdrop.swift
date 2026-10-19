@@ -1,21 +1,55 @@
 import MoonlightCore
 import SwiftUI
+import UIKit
 
 struct SceneBackdrop: View {
     var scene: AmbientScene
     var still: Bool = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var topInset: CGFloat = 59
 
     private var paused: Bool { still || reduceMotion }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: paused)) { timeline in
             Canvas { context, size in
-                draw(scene, in: context, size: size, date: timeline.date, animated: !paused)
+                draw(
+                    scene,
+                    in: context,
+                    size: size,
+                    date: timeline.date,
+                    animated: !paused,
+                    topInset: still ? 0 : topInset
+                )
             }
         }
         .modifier(BleedToEdges(enabled: !still))
+        .background {
+            if !still {
+                WindowSafeTop(top: $topInset)
+            }
+        }
         .accessibilityHidden(true)
+    }
+}
+
+private struct WindowSafeTop: UIViewRepresentable {
+    @Binding var top: CGFloat
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.isUserInteractionEnabled = false
+        view.backgroundColor = .clear
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        DispatchQueue.main.async {
+            let inset = uiView.window?.safeAreaInsets.top ?? 0
+            if inset > 1, inset != top {
+                top = inset
+            }
+        }
     }
 }
 
@@ -37,14 +71,15 @@ private func draw(
     in context: GraphicsContext,
     size: CGSize,
     date: Date,
-    animated: Bool
+    animated: Bool,
+    topInset: CGFloat
 ) {
     let time = animated ? date.timeIntervalSinceReferenceDate : 0
     switch scene {
     case .lunaStudy, .lunaSleep, .lunaRooftop:
         fillGradient(context, size, top: rgb(0.07, 0.07, 0.14), bottom: rgb(0.03, 0.04, 0.08))
     case .moonGarden:
-        drawMoonGarden(context, size, time)
+        drawMoonGarden(context, size, time, topInset: topInset)
     case .rainWindow:
         drawRainWindow(context, size, time, animated: animated)
     case .cityWindow:
@@ -56,11 +91,17 @@ private func draw(
     }
 }
 
-private func drawMoonGarden(_ context: GraphicsContext, _ size: CGSize, _ time: TimeInterval) {
+private func drawMoonGarden(_ context: GraphicsContext, _ size: CGSize, _ time: TimeInterval, topInset: CGFloat) {
     fillGradient(context, size, top: rgb(0.10, 0.08, 0.22), bottom: rgb(0.03, 0.04, 0.09))
-    let center = CGPoint(x: size.width * 0.86, y: size.height * 0.06)
-    let radius = min(size.width, size.height) * 0.07
-    fillGlow(context, center: center, radius: radius * 1.6, color: Color.white.opacity(0.28))
+    let fullScreen = size.height > 500
+    let radius = fullScreen ? min(size.width * 0.042, 16) : min(size.width, size.height) * 0.16
+    let glow = radius * 1.45
+    let bar = fullScreen ? (topInset > 1 ? topInset : 59) : 0
+    let center = CGPoint(
+        x: fullScreen ? size.width * 0.30 : size.width * 0.62,
+        y: bar + glow + (fullScreen ? 12 : radius)
+    )
+    fillGlow(context, center: center, radius: glow, color: Color.white.opacity(0.28))
     fillCircle(context, center: center, radius: radius, color: rgb(0.95, 0.93, 1))
     fillCircle(
         context,
